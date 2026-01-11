@@ -1,17 +1,20 @@
 # Markdown Editor
 
-A modern, feature-rich markdown editor with live preview, syntax highlighting, and export capabilities. Built with vanilla JavaScript, HTML, and CSS.
+A modern, feature-rich markdown and rich text editor with live preview, syntax highlighting, and export capabilities. Built with vanilla JavaScript, HTML, and CSS.
 
 ![Markdown Editor](https://img.shields.io/badge/Editor-Markdown-blue)
+![Rich Text](https://img.shields.io/badge/Editor-Rich%20Text-purple)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ## Features
 
 ### Core Functionality
+- **Dual Editor Modes** - Toggle between Markdown and Rich Text (WYSIWYG) editing
 - **Live Preview** - Real-time markdown rendering as you type
 - **Auto-save** - Automatic saving to browser's local storage every 2 seconds
 - **Dark Mode** - Eye-friendly dark theme with system preference detection
 - **Responsive Design** - Optimized for desktop, tablet, and mobile devices
+- **Fullscreen Mode** - Expand editor or preview to fullscreen for focused work
 
 ### Export Options
 - Download as Markdown (.md)
@@ -20,20 +23,26 @@ A modern, feature-rich markdown editor with live preview, syntax highlighting, a
 - Copy HTML to clipboard
 
 ### Editor Features
-- Resizable split-pane layout (drag the divider)
-- GitHub Flavored Markdown (GFM) support
-- Syntax highlighting for code blocks (powered by Highlight.js)
-- Support for tables, task lists, and more
-- Keyboard shortcuts (Ctrl+S to download)
-- Clear editor with confirmation dialog
+- **Resizable split-pane layout** - Drag the divider between editor and preview
+- **GitHub Flavored Markdown (GFM)** support
+- **Syntax highlighting** for code blocks (powered by Highlight.js)
+- **Rich Text Toolbar** - Bold, italic, underline, headings, lists, and more
+- **Image Support** - Paste from clipboard, drag-and-drop, or upload files
+- **Table Insertion** - Create tables with custom rows and columns
+- **Code Blocks** - Insert formatted code with syntax highlighting
+- **Link & Image Insertion** - Easy insertion with prompts
+- **Keyboard shortcuts** - Ctrl/Cmd+S to download
+- **Security** - XSS protection with DOMPurify sanitization
 
 ## Technology Stack
 
-- **HTML5** - Semantic structure
+- **HTML5** - Semantic structure with Content Security Policy
 - **CSS3** - Modern styling with CSS Grid, Flexbox, and CSS Variables
 - **Vanilla JavaScript (ES6+)** - No frameworks required
-- **Marked.js** - Markdown parsing library
+- **Marked.js** - Markdown to HTML parsing
+- **Turndown.js** - HTML to Markdown conversion
 - **Highlight.js** - Code syntax highlighting
+- **DOMPurify** - XSS protection and HTML sanitization
 
 ## Getting Started
 
@@ -48,11 +57,13 @@ No build process or dependencies installation required! Just open and use.
 
 ### Usage
 
-1. **Write Markdown** - Type your markdown in the editor pane (left side)
-2. **View Preview** - See the rendered HTML in the preview pane (right side)
-3. **Toggle Dark Mode** - Click the moon/sun icon in the header
-4. **Export Your Work** - Use the toolbar buttons to download or copy
-5. **Clear Editor** - Click the "Clear" button to start fresh
+1. **Choose Editor Mode** - Toggle between Markdown and Rich Text editing
+2. **Write Content** - Type your content in the editor pane (left side)
+3. **View Preview** - See the rendered HTML in the preview pane (right side)
+4. **Format Text** - Use the rich text toolbar for formatting (in Rich Text mode)
+5. **Toggle Dark Mode** - Click the moon/sun icon in the header
+6. **Export Your Work** - Use the toolbar buttons to download or copy
+7. **Fullscreen** - Click the fullscreen icon on editor or preview for focused work
 
 ### Keyboard Shortcuts
 
@@ -90,13 +101,16 @@ Requires JavaScript enabled and support for:
 
 ```
 markdown-editor/
-├── index.html           # Main HTML file
-├── styles.css           # CSS styling with dark mode
-├── app.js              # Application logic
-├── markdown-parser.js  # Markdown parsing wrapper
-├── package.json        # Project metadata
-├── .gitignore         # Git ignore rules
-└── README.md          # This file
+├── index.html              # Main HTML file
+├── styles.css              # CSS styling with dark mode
+├── app.js                  # Core application logic
+├── markdown-parser.js      # Markdown parsing wrapper
+├── rich-text-editor.js     # Rich text editor functionality
+├── package.json            # Project metadata
+├── LICENSE                 # MIT License
+├── CONTRIBUTING.md         # Contribution guidelines
+├── .gitignore             # Git ignore rules
+└── README.md              # This file
 ```
 
 ## Features in Detail
@@ -131,21 +145,32 @@ Potential features for future versions:
 
 ## Contributing
 
-This is a demonstration project created with Claude Code. Feel free to fork and enhance!
+Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting pull requests.
+
+Ways to contribute:
+- Report bugs and suggest features
+- Submit pull requests for improvements
+- Improve documentation
+- Share the project with others
+
+Please review our [Contributing Guidelines](CONTRIBUTING.md) for details on our code of conduct and development process.
 
 ## License
 
-MIT License - Feel free to use this project for any purpose.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Credits
 
 Built with:
 - [Marked.js](https://marked.js.org/) - Fast markdown parser
+- [Turndown.js](https://github.com/mixmark-io/turndown) - HTML to Markdown conversion
 - [Highlight.js](https://highlightjs.org/) - Syntax highlighting
-- Created with [Claude Code](https://claude.com/claude-code)
+- [DOMPurify](https://github.com/cure53/DOMPurify) - XSS protection
+- Created by [Emrullah Celik](https://www.emrullahcelik.com/)
+- Developed with [Claude Code](https://claude.com/claude-code)
 
 ---
 
 **Start editing and see the magic happen!** ✨
 
-Created on 2026-01-10
+For questions or support, visit the [GitHub repository](https://github.com/Emrullah007/markdown-editor).
