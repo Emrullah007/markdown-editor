@@ -87,6 +87,15 @@ class MarkdownEditor {
             this.copyHtml();
         });
 
+        // Fullscreen buttons
+        document.getElementById('editorFullscreenBtn').addEventListener('click', () => {
+            this.toggleEditorFullscreen();
+        });
+
+        document.getElementById('previewFullscreenBtn').addEventListener('click', () => {
+            this.togglePreviewFullscreen();
+        });
+
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             // Ctrl+S or Cmd+S to download markdown
@@ -478,6 +487,36 @@ console.log(greet('World'));
                 document.body.style.cursor = 'default';
             }
         });
+    }
+
+    toggleEditorFullscreen() {
+        const editorPane = document.querySelector('.editor-pane');
+        const btn = document.getElementById('editorFullscreenBtn');
+
+        editorPane.classList.toggle('fullscreen');
+
+        if (editorPane.classList.contains('fullscreen')) {
+            btn.textContent = '⛶'; // Exit fullscreen icon
+            btn.title = 'Exit fullscreen';
+        } else {
+            btn.textContent = '⛶'; // Fullscreen icon
+            btn.title = 'Toggle editor fullscreen';
+        }
+    }
+
+    togglePreviewFullscreen() {
+        const previewPane = document.querySelector('.preview-pane');
+        const btn = document.getElementById('previewFullscreenBtn');
+
+        previewPane.classList.toggle('fullscreen');
+
+        if (previewPane.classList.contains('fullscreen')) {
+            btn.textContent = '⛶'; // Exit fullscreen icon
+            btn.title = 'Exit fullscreen';
+        } else {
+            btn.textContent = '⛶'; // Fullscreen icon
+            btn.title = 'Toggle preview fullscreen';
+        }
     }
 }
 
