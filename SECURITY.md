@@ -2,20 +2,63 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
-
 | Version | Supported          |
 | ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| 1.0.x   | :white_check_mark: |
+
+## Security Features
+
+This project implements several security measures:
+
+### XSS Protection
+- **DOMPurify Sanitization**: All HTML output is sanitized using DOMPurify with a strict whitelist
+- **Content Security Policy**: CSP headers restrict script and style sources
+- **No eval() or Function()**: Code doesn't use dangerous JavaScript functions
+- **Safe innerHTML usage**: All user-generated content is sanitized before rendering
+
+### Data Protection
+- **Client-side only**: All data is stored locally in browser's localStorage
+- **No server communication**: No data is sent to external servers
+- **Base64 image encoding**: Images are embedded as data URIs, not uploaded
+
+### External Dependencies
+- All CDN resources use HTTPS with SRI (Subresource Integrity) recommended
+- Libraries used:
+  - Marked.js (Markdown parsing)
+  - Turndown.js (HTML to Markdown)
+  - Highlight.js (Syntax highlighting)
+  - DOMPurify (XSS protection)
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+If you discover a security vulnerability, please report it by:
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+1. **DO NOT** open a public GitHub issue
+2. Email the maintainer at: security@emrullahcelik.com (or open a private security advisory on GitHub)
+3. Include:
+   - Description of the vulnerability
+   - Steps to reproduce
+   - Potential impact
+   - Suggested fix (if any)
+
+### Response Timeline
+- **Initial Response**: Within 48 hours
+- **Status Update**: Within 7 days
+- **Fix Timeline**: Critical issues within 14 days, others within 30 days
+
+### What to Expect
+- **Accepted**: We'll work on a fix and credit you in the release notes (unless you prefer to remain anonymous)
+- **Declined**: We'll explain why the reported issue isn't considered a vulnerability
+
+## Security Best Practices for Users
+
+1. **Keep browsers updated**: Use the latest version of modern browsers
+2. **Review localStorage data**: Clear localStorage if you've pasted sensitive information
+3. **Use HTTPS**: When deploying, always use HTTPS
+4. **Verify integrity**: Check that CDN resources load correctly
+
+## Known Limitations
+
+- **localStorage size**: Limited to ~5-10MB depending on browser
+- **Client-side only**: No server-side validation or backup
+- **Browser security**: Relies on browser's security model

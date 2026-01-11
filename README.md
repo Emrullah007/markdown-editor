@@ -109,8 +109,8 @@ markdown-editor/
 ├── package.json            # Project metadata
 ├── LICENSE                 # MIT License
 ├── CONTRIBUTING.md         # Contribution guidelines
-├── .gitignore             # Git ignore rules
-└── README.md              # This file
+├── .gitignore              # Git ignore rules
+└── README.md               # This file
 ```
 
 ## Features in Detail

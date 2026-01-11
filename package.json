@@ -13,10 +13,10 @@
     "syntax-highlighting",
     "web-app"
   ],
-  "author": "",
+  "author": "Emrullah Celik <https://www.emrullahcelik.com/>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/Emrullah007/markdown-editor.git"
   }
 }
