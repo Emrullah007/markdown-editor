@@ -20,6 +20,6 @@
     "url": "https://github.com/Emrullah007/markdown-editor.git"
   },
   "dependencies": {
-    "@vercel/analytics": "^1.4.0"
+    "@vercel/analytics": "^1.6.1"
   }
 }
