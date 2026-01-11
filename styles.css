@@ -639,13 +639,34 @@ body.dark-mode .keyboard-hint:hover {
 }
 
 /* Rich text toolbar */
-.rich-text-toolbar {
+.rich-text-toolbar-wrapper {
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.75rem 1.5rem;
+}
+
+.rich-text-toolbar-content {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.toolbar-section {
     display: flex;
     gap: 0.5rem;
-    flex-wrap: wrap;
-    padding: 0.5rem;
-    background: var(--bg-secondary);
-    border-radius: 8px;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.toolbar-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 0.25rem;
+    white-space: nowrap;
 }
 
 .btn-select {

@@ -57,32 +57,6 @@
                 </button>
             </div>
 
-            <!-- Rich text formatting toolbar (hidden by default) -->
-            <div id="richTextToolbar" class="toolbar-group rich-text-toolbar" style="display: none;">
-                <select id="headingSelect" class="btn-select" title="Select heading level">
-                    <option value="p">Normal</option>
-                    <option value="h1">Heading 1</option>
-                    <option value="h2">Heading 2</option>
-                    <option value="h3">Heading 3</option>
-                    <option value="h4">Heading 4</option>
-                    <option value="h5">Heading 5</option>
-                    <option value="h6">Heading 6</option>
-                </select>
-                <button id="boldBtn" class="btn btn-icon" title="Bold"><b>B</b></button>
-                <button id="italicBtn" class="btn btn-icon" title="Italic"><i>I</i></button>
-                <button id="underlineBtn" class="btn btn-icon" title="Underline"><u>U</u></button>
-                <button id="strikeBtn" class="btn btn-icon" title="Strikethrough"><s>S</s></button>
-                <div class="divider"></div>
-                <button id="bulletListBtn" class="btn btn-icon" title="Bullet list">• List</button>
-                <button id="numberListBtn" class="btn btn-icon" title="Numbered list">1. List</button>
-                <button id="checkListBtn" class="btn btn-icon" title="Checklist">☑ List</button>
-                <div class="divider"></div>
-                <button id="linkBtn" class="btn btn-icon" title="Insert link">🔗</button>
-                <button id="imageBtn" class="btn btn-icon" title="Insert image">🖼️</button>
-                <button id="tableBtn" class="btn btn-icon" title="Insert table">📊</button>
-                <button id="codeBlockBtn" class="btn btn-icon" title="Code block">&lt;/&gt;</button>
-            </div>
-
             <div class="toolbar-group">
                 <button id="downloadMdBtn" class="btn" title="Download as Markdown">
                     ⬇️ .md
@@ -96,6 +70,43 @@
                 <button id="copyHtmlBtn" class="btn" title="Copy HTML to clipboard">
                     📋 Copy HTML
                 </button>
+            </div>
+        </div>
+
+        <!-- Rich text formatting toolbar (hidden by default) -->
+        <div id="richTextToolbar" class="rich-text-toolbar-wrapper" style="display: none;">
+            <div class="rich-text-toolbar-content">
+                <div class="toolbar-section">
+                    <label class="toolbar-label">Format</label>
+                    <select id="headingSelect" class="btn-select" title="Select heading level">
+                        <option value="p">Normal</option>
+                        <option value="h1">Heading 1</option>
+                        <option value="h2">Heading 2</option>
+                        <option value="h3">Heading 3</option>
+                        <option value="h4">Heading 4</option>
+                        <option value="h5">Heading 5</option>
+                        <option value="h6">Heading 6</option>
+                    </select>
+                    <button id="boldBtn" class="btn btn-icon" title="Bold"><b>B</b></button>
+                    <button id="italicBtn" class="btn btn-icon" title="Italic"><i>I</i></button>
+                    <button id="underlineBtn" class="btn btn-icon" title="Underline"><u>U</u></button>
+                    <button id="strikeBtn" class="btn btn-icon" title="Strikethrough"><s>S</s></button>
+                </div>
+                <div class="divider"></div>
+                <div class="toolbar-section">
+                    <label class="toolbar-label">Lists</label>
+                    <button id="bulletListBtn" class="btn btn-icon" title="Bullet list">• List</button>
+                    <button id="numberListBtn" class="btn btn-icon" title="Numbered list">1. List</button>
+                    <button id="checkListBtn" class="btn btn-icon" title="Checklist">☑ List</button>
+                </div>
+                <div class="divider"></div>
+                <div class="toolbar-section">
+                    <label class="toolbar-label">Insert</label>
+                    <button id="linkBtn" class="btn btn-icon" title="Insert link">🔗</button>
+                    <button id="imageBtn" class="btn btn-icon" title="Insert image">🖼️</button>
+                    <button id="tableBtn" class="btn btn-icon" title="Insert table">📊</button>
+                    <button id="codeBlockBtn" class="btn btn-icon" title="Code block">&lt;/&gt;</button>
+                </div>
             </div>
         </div>
 

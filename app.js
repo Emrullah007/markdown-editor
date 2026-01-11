@@ -133,7 +133,7 @@ class MarkdownEditor {
             // Toggle visibility
             this.editor.style.display = 'none';
             this.richTextEditorElement.style.display = 'block';
-            this.richTextToolbar.style.display = 'flex';
+            this.richTextToolbar.style.display = 'block';
 
             // Update UI
             document.getElementById('modeToggle').innerHTML = '📝 Switch to Markdown';
