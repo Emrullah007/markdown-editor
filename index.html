@@ -17,6 +17,10 @@
 
     <!-- Highlight.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- Turndown.js for HTML to Markdown conversion -->
+    <script src="https://cdn.jsdelivr.net/npm/turndown@7.1.2/dist/turndown.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/turndown-plugin-gfm@1.0.2/dist/turndown-plugin-gfm.js"></script>
 </head>
 <body>
     <div class="container">
@@ -35,10 +39,40 @@
         <!-- Toolbar -->
         <div class="toolbar">
             <div class="toolbar-group">
+                <button id="modeToggle" class="btn btn-primary" title="Toggle editor mode">
+                    📝 Switch to Rich Text
+                </button>
                 <button id="clearBtn" class="btn btn-secondary" title="Clear editor">
                     🗑️ Clear
                 </button>
             </div>
+
+            <!-- Rich text formatting toolbar (hidden by default) -->
+            <div id="richTextToolbar" class="toolbar-group rich-text-toolbar" style="display: none;">
+                <select id="headingSelect" class="btn-select" title="Select heading level">
+                    <option value="p">Normal</option>
+                    <option value="h1">Heading 1</option>
+                    <option value="h2">Heading 2</option>
+                    <option value="h3">Heading 3</option>
+                    <option value="h4">Heading 4</option>
+                    <option value="h5">Heading 5</option>
+                    <option value="h6">Heading 6</option>
+                </select>
+                <button id="boldBtn" class="btn btn-icon" title="Bold"><b>B</b></button>
+                <button id="italicBtn" class="btn btn-icon" title="Italic"><i>I</i></button>
+                <button id="underlineBtn" class="btn btn-icon" title="Underline"><u>U</u></button>
+                <button id="strikeBtn" class="btn btn-icon" title="Strikethrough"><s>S</s></button>
+                <div class="divider"></div>
+                <button id="bulletListBtn" class="btn btn-icon" title="Bullet list">• List</button>
+                <button id="numberListBtn" class="btn btn-icon" title="Numbered list">1. List</button>
+                <button id="checkListBtn" class="btn btn-icon" title="Checklist">☑ List</button>
+                <div class="divider"></div>
+                <button id="linkBtn" class="btn btn-icon" title="Insert link">🔗</button>
+                <button id="imageBtn" class="btn btn-icon" title="Insert image">🖼️</button>
+                <button id="tableBtn" class="btn btn-icon" title="Insert table">📊</button>
+                <button id="codeBlockBtn" class="btn btn-icon" title="Code block">&lt;/&gt;</button>
+            </div>
+
             <div class="toolbar-group">
                 <button id="downloadMdBtn" class="btn" title="Download as Markdown">
                     ⬇️ .md
@@ -60,7 +94,7 @@
             <!-- Editor pane -->
             <div class="editor-pane">
                 <div class="pane-header">
-                    <h2>Editor</h2>
+                    <h2 id="editorModeLabel">Markdown Editor</h2>
                     <span class="status" id="saveStatus">Auto-save enabled</span>
                 </div>
                 <textarea
@@ -69,6 +103,12 @@
                     placeholder="Start typing your markdown here..."
                     spellcheck="false"
                 ></textarea>
+                <!-- Rich text editor (hidden initially) -->
+                <div id="richTextEditor"
+                     class="rich-text-editor"
+                     contenteditable="true"
+                     style="display: none;"
+                     spellcheck="true"></div>
             </div>
 
             <!-- Resizer -->
@@ -91,6 +131,7 @@
 
     <!-- Scripts -->
     <script src="markdown-parser.js"></script>
+    <script src="rich-text-editor.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

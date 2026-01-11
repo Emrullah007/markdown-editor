@@ -7,6 +7,12 @@ class MarkdownEditor {
         this.preview = document.getElementById('preview');
         this.saveStatus = document.getElementById('saveStatus');
 
+        // Rich text editor elements
+        this.richTextEditorElement = document.getElementById('richTextEditor');
+        this.richTextEditor = null;
+        this.currentMode = 'markdown'; // 'markdown' or 'richtext'
+        this.richTextToolbar = document.getElementById('richTextToolbar');
+
         // Storage keys
         this.STORAGE_KEY = 'markdown-editor-content';
         this.DARK_MODE_KEY = 'markdown-editor-dark-mode';
@@ -23,6 +29,13 @@ class MarkdownEditor {
         this.setupEventListeners();
         this.loadContent();
         this.loadDarkModePreference();
+
+        // Initialize rich text editor
+        this.richTextEditor = new RichTextEditor(
+            this.richTextEditorElement,
+            this
+        );
+
         this.updatePreview();
     }
 
@@ -31,6 +44,16 @@ class MarkdownEditor {
         this.editor.addEventListener('input', () => {
             this.updatePreview();
             this.scheduleAutoSave();
+        });
+
+        // Mode toggle
+        document.getElementById('modeToggle').addEventListener('click', () => {
+            this.toggleMode();
+        });
+
+        // Rich text editor input
+        this.richTextEditorElement.addEventListener('input', () => {
+            this.handleRichTextInput();
         });
 
         // Dark mode toggle
@@ -42,6 +65,9 @@ class MarkdownEditor {
         document.getElementById('clearBtn').addEventListener('click', () => {
             this.clearEditor();
         });
+
+        // Rich text toolbar buttons
+        this.setupRichTextToolbar();
 
         // Download buttons
         document.getElementById('downloadMdBtn').addEventListener('click', () => {
@@ -80,6 +106,92 @@ class MarkdownEditor {
         this.preview.innerHTML = html;
     }
 
+    toggleMode() {
+        if (this.currentMode === 'markdown') {
+            // Switch to rich text mode
+            this.currentMode = 'richtext';
+
+            // Convert markdown to HTML and set in rich text editor
+            const markdown = this.editor.value;
+            this.richTextEditor.setContent(markdown);
+
+            // Toggle visibility
+            this.editor.style.display = 'none';
+            this.richTextEditorElement.style.display = 'block';
+            this.richTextToolbar.style.display = 'flex';
+
+            // Update UI
+            document.getElementById('modeToggle').innerHTML = '📝 Switch to Markdown';
+            document.getElementById('editorModeLabel').textContent = 'Rich Text Editor';
+
+        } else {
+            // Switch to markdown mode
+            this.currentMode = 'markdown';
+
+            // Convert HTML to markdown and set in textarea
+            const markdown = this.richTextEditor.getMarkdown();
+            this.editor.value = markdown;
+
+            // Toggle visibility
+            this.editor.style.display = 'block';
+            this.richTextEditorElement.style.display = 'none';
+            this.richTextToolbar.style.display = 'none';
+
+            // Update UI
+            document.getElementById('modeToggle').innerHTML = '📝 Switch to Rich Text';
+            document.getElementById('editorModeLabel').textContent = 'Markdown Editor';
+
+            // Update preview
+            this.updatePreview();
+        }
+    }
+
+    handleRichTextInput() {
+        // Convert to markdown and update preview
+        const markdown = this.richTextEditor.getMarkdown();
+        const html = markdownParser.parse(markdown);
+        this.preview.innerHTML = html;
+
+        // Schedule auto-save
+        this.scheduleAutoSave();
+    }
+
+    setupRichTextToolbar() {
+        // Bold, italic, underline, strikethrough
+        document.getElementById('boldBtn').addEventListener('click', () =>
+            this.richTextEditor.formatText('bold'));
+        document.getElementById('italicBtn').addEventListener('click', () =>
+            this.richTextEditor.formatText('italic'));
+        document.getElementById('underlineBtn').addEventListener('click', () =>
+            this.richTextEditor.formatText('underline'));
+        document.getElementById('strikeBtn').addEventListener('click', () =>
+            this.richTextEditor.formatText('strikeThrough'));
+
+        // Headings
+        document.getElementById('headingSelect').addEventListener('change', (e) => {
+            this.richTextEditor.applyHeading(e.target.value);
+            e.target.value = 'p'; // Reset to normal
+        });
+
+        // Lists
+        document.getElementById('bulletListBtn').addEventListener('click', () =>
+            this.richTextEditor.insertList('ul'));
+        document.getElementById('numberListBtn').addEventListener('click', () =>
+            this.richTextEditor.insertList('ol'));
+        document.getElementById('checkListBtn').addEventListener('click', () =>
+            this.richTextEditor.insertList('checklist'));
+
+        // Insert elements
+        document.getElementById('linkBtn').addEventListener('click', () =>
+            this.richTextEditor.insertLink());
+        document.getElementById('imageBtn').addEventListener('click', () =>
+            this.richTextEditor.insertImage());
+        document.getElementById('tableBtn').addEventListener('click', () =>
+            this.richTextEditor.insertTable());
+        document.getElementById('codeBlockBtn').addEventListener('click', () =>
+            this.richTextEditor.insertCodeBlock());
+    }
+
     scheduleAutoSave() {
         // Clear existing timer
         if (this.autoSaveTimer) {
@@ -95,8 +207,16 @@ class MarkdownEditor {
     }
 
     saveContent() {
+        let content;
+        if (this.currentMode === 'markdown') {
+            content = this.editor.value;
+        } else {
+            // Save as markdown (converted from rich text)
+            content = this.richTextEditor.getMarkdown();
+        }
+
         try {
-            localStorage.setItem(this.STORAGE_KEY, this.editor.value);
+            localStorage.setItem(this.STORAGE_KEY, content);
             this.updateSaveStatus('Saved');
 
             // Reset status after 2 seconds
@@ -236,20 +356,34 @@ console.log(greet('World'));
 
     clearEditor() {
         if (confirm('Are you sure you want to clear the editor? This action cannot be undone.')) {
-            this.editor.value = '';
+            if (this.currentMode === 'markdown') {
+                this.editor.value = '';
+            } else {
+                this.richTextEditorElement.innerHTML = '';
+            }
             this.updatePreview();
             this.saveContent();
         }
     }
 
     downloadMarkdown() {
-        const content = this.editor.value;
+        let content;
+        if (this.currentMode === 'markdown') {
+            content = this.editor.value;
+        } else {
+            content = this.richTextEditor.getMarkdown();
+        }
         const blob = new Blob([content], { type: 'text/markdown' });
         this.downloadFile(blob, 'document.md');
     }
 
     downloadHtml() {
-        const markdown = this.editor.value;
+        let markdown;
+        if (this.currentMode === 'markdown') {
+            markdown = this.editor.value;
+        } else {
+            markdown = this.richTextEditor.getMarkdown();
+        }
         const html = markdownParser.getHtmlDocument(markdown, 'Markdown Export');
         const blob = new Blob([html], { type: 'text/html' });
         this.downloadFile(blob, 'document.html');
@@ -267,8 +401,14 @@ console.log(greet('World'));
     }
 
     async copyMarkdown() {
+        let content;
+        if (this.currentMode === 'markdown') {
+            content = this.editor.value;
+        } else {
+            content = this.richTextEditor.getMarkdown();
+        }
         try {
-            await navigator.clipboard.writeText(this.editor.value);
+            await navigator.clipboard.writeText(content);
             this.showCopySuccess('Markdown copied!');
         } catch (error) {
             console.error('Copy failed:', error);
@@ -277,8 +417,14 @@ console.log(greet('World'));
     }
 
     async copyHtml() {
+        let markdown;
+        if (this.currentMode === 'markdown') {
+            markdown = this.editor.value;
+        } else {
+            markdown = this.richTextEditor.getMarkdown();
+        }
         try {
-            const html = markdownParser.parse(this.editor.value);
+            const html = markdownParser.parse(markdown);
             await navigator.clipboard.writeText(html);
             this.showCopySuccess('HTML copied!');
         } catch (error) {

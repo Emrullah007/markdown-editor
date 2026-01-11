@@ -428,3 +428,197 @@ body {
 .preview-content {
     animation: fadeIn 0.3s ease;
 }
+
+/* ===== Rich Text Editor Styles ===== */
+
+/* Rich text editor container */
+.rich-text-editor {
+    width: 100%;
+    height: 100%;
+    padding: 1.5rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-y: auto;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    outline: none;
+    cursor: text;
+}
+
+.rich-text-editor:focus {
+    border-color: var(--accent-color);
+}
+
+/* Rich text toolbar */
+.rich-text-toolbar {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+}
+
+.btn-select {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.btn-select:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--accent-color);
+}
+
+.btn-primary {
+    background: var(--accent-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+}
+
+.divider {
+    width: 1px;
+    background: var(--border-color);
+    margin: 0 0.25rem;
+}
+
+/* Rich text editor content styling */
+.rich-text-editor h1,
+.rich-text-editor h2,
+.rich-text-editor h3,
+.rich-text-editor h4,
+.rich-text-editor h5,
+.rich-text-editor h6 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--text-primary);
+}
+
+.rich-text-editor h1 { font-size: 2.5rem; }
+.rich-text-editor h2 { font-size: 2rem; }
+.rich-text-editor h3 { font-size: 1.75rem; }
+.rich-text-editor h4 { font-size: 1.5rem; }
+.rich-text-editor h5 { font-size: 1.25rem; }
+.rich-text-editor h6 { font-size: 1rem; }
+
+.rich-text-editor p {
+    margin: 0.75rem 0;
+}
+
+.rich-text-editor ul,
+.rich-text-editor ol {
+    margin: 1rem 0;
+    padding-left: 2rem;
+}
+
+.rich-text-editor li {
+    margin: 0.5rem 0;
+}
+
+.rich-text-editor blockquote {
+    margin: 1rem 0;
+    padding: 0.75rem 1.5rem;
+    border-left: 4px solid var(--accent-color);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+}
+
+.rich-text-editor table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1rem 0;
+}
+
+.rich-text-editor table td,
+.rich-text-editor table th {
+    border: 1px solid var(--border-color);
+    padding: 0.75rem;
+    text-align: left;
+}
+
+.rich-text-editor table th {
+    background: var(--bg-secondary);
+    font-weight: 600;
+}
+
+.rich-text-editor table tr:hover {
+    background: var(--bg-secondary);
+}
+
+.rich-text-editor img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1rem 0;
+    display: block;
+}
+
+.rich-text-editor a {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
+.rich-text-editor a:hover {
+    color: var(--accent-hover);
+}
+
+.rich-text-editor code {
+    background: var(--code-bg);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 0.9em;
+    color: var(--text-primary);
+}
+
+.rich-text-editor pre {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--border-color);
+}
+
+.rich-text-editor pre code {
+    background: transparent;
+    padding: 0;
+}
+
+.rich-text-editor hr {
+    margin: 2rem 0;
+    border: none;
+    border-top: 2px solid var(--border-color);
+}
+
+/* Task list checkboxes */
+.rich-text-editor input[type="checkbox"] {
+    margin-right: 0.5rem;
+    cursor: pointer;
+}
+
+/* Placeholder for empty editor */
+.rich-text-editor:empty:before {
+    content: 'Start typing your document here...';
+    color: var(--text-secondary);
+    pointer-events: none;
+}
+
+/* Selection styling in rich text editor */
+.rich-text-editor ::selection {
+    background: var(--accent-color);
+    color: white;
+}
