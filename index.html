@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A modern markdown editor with live preview, syntax highlighting, and export features">
+    <title>Markdown Editor - Live Preview & Export</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Highlight.js for syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+
+    <!-- Marked.js for markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+
+    <!-- Highlight.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="logo">📝 Markdown Editor</h1>
+                <div class="header-actions">
+                    <button id="darkModeToggle" class="btn btn-icon" title="Toggle dark mode">
+                        🌙
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="toolbar-group">
+                <button id="clearBtn" class="btn btn-secondary" title="Clear editor">
+                    🗑️ Clear
+                </button>
+            </div>
+            <div class="toolbar-group">
+                <button id="downloadMdBtn" class="btn" title="Download as Markdown">
+                    ⬇️ .md
+                </button>
+                <button id="downloadHtmlBtn" class="btn" title="Download as HTML">
+                    ⬇️ .html
+                </button>
+                <button id="copyMdBtn" class="btn" title="Copy markdown to clipboard">
+                    📋 Copy MD
+                </button>
+                <button id="copyHtmlBtn" class="btn" title="Copy HTML to clipboard">
+                    📋 Copy HTML
+                </button>
+            </div>
+        </div>
+
+        <!-- Main content area -->
+        <main class="main-content">
+            <!-- Editor pane -->
+            <div class="editor-pane">
+                <div class="pane-header">
+                    <h2>Editor</h2>
+                    <span class="status" id="saveStatus">Auto-save enabled</span>
+                </div>
+                <textarea
+                    id="editor"
+                    class="editor-textarea"
+                    placeholder="Start typing your markdown here..."
+                    spellcheck="false"
+                ></textarea>
+            </div>
+
+            <!-- Resizer -->
+            <div class="resizer"></div>
+
+            <!-- Preview pane -->
+            <div class="preview-pane">
+                <div class="pane-header">
+                    <h2>Preview</h2>
+                </div>
+                <div id="preview" class="preview-content"></div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Built with ❤️ using Marked.js & Highlight.js | Press Ctrl+S to download</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="markdown-parser.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

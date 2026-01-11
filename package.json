@@ -1,0 +1,22 @@
+{
+  "name": "markdown-editor",
+  "version": "1.0.0",
+  "description": "A modern, interactive markdown editor with live preview, syntax highlighting, and export capabilities",
+  "main": "index.html",
+  "scripts": {
+    "start": "open index.html"
+  },
+  "keywords": [
+    "markdown",
+    "editor",
+    "live-preview",
+    "syntax-highlighting",
+    "web-app"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}

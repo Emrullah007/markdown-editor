@@ -1,0 +1,430 @@
+/* CSS Variables for theming */
+:root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f7fa;
+    --bg-tertiary: #e8ecf1;
+    --text-primary: #2c3e50;
+    --text-secondary: #546e7a;
+    --border-color: #d1d9e0;
+    --accent-color: #3498db;
+    --accent-hover: #2980b9;
+    --success-color: #27ae60;
+    --danger-color: #e74c3c;
+    --header-bg: #2c3e50;
+    --header-text: #ffffff;
+    --shadow: rgba(0, 0, 0, 0.1);
+    --code-bg: #f8f9fa;
+}
+
+/* Dark mode variables */
+body.dark-mode {
+    --bg-primary: #1e1e1e;
+    --bg-secondary: #252526;
+    --bg-tertiary: #2d2d30;
+    --text-primary: #d4d4d4;
+    --text-secondary: #969696;
+    --border-color: #3e3e42;
+    --accent-color: #4fc3f7;
+    --accent-hover: #29b6f6;
+    --success-color: #66bb6a;
+    --danger-color: #ef5350;
+    --header-bg: #1e1e1e;
+    --header-text: #d4d4d4;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --code-bg: #2d2d30;
+}
+
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Container */
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Header */
+.header {
+    background-color: var(--header-bg);
+    color: var(--header-text);
+    padding: 1rem 1.5rem;
+    box-shadow: 0 2px 4px var(--shadow);
+    z-index: 10;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Toolbar */
+.toolbar {
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.toolbar-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Buttons */
+.btn {
+    padding: 0.5rem 1rem;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px var(--shadow);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    background-color: var(--danger-color);
+}
+
+.btn-secondary:hover {
+    background-color: #c0392b;
+}
+
+.btn-icon {
+    padding: 0.5rem;
+    font-size: 1.25rem;
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+}
+
+.btn-icon:hover {
+    background-color: var(--bg-tertiary);
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* Main content */
+.main-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Panes */
+.editor-pane,
+.preview-pane {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: var(--bg-primary);
+}
+
+.editor-pane {
+    flex: 1;
+    min-width: 300px;
+}
+
+.preview-pane {
+    flex: 1;
+    min-width: 300px;
+    border-left: 1px solid var(--border-color);
+}
+
+.pane-header {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pane-header h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.status {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* Editor textarea */
+.editor-textarea {
+    flex: 1;
+    padding: 1.5rem;
+    border: none;
+    outline: none;
+    resize: none;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    overflow-y: auto;
+}
+
+.editor-textarea::placeholder {
+    color: var(--text-secondary);
+}
+
+/* Preview content */
+.preview-content {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    background-color: var(--bg-primary);
+}
+
+/* Markdown styling in preview */
+.preview-content h1,
+.preview-content h2,
+.preview-content h3,
+.preview-content h4,
+.preview-content h5,
+.preview-content h6 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--text-primary);
+}
+
+.preview-content h1 {
+    font-size: 2rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+.preview-content h2 {
+    font-size: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+.preview-content h3 { font-size: 1.25rem; }
+.preview-content h4 { font-size: 1rem; }
+.preview-content h5 { font-size: 0.875rem; }
+.preview-content h6 { font-size: 0.75rem; }
+
+.preview-content p {
+    margin-bottom: 1rem;
+    line-height: 1.7;
+}
+
+.preview-content a {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+.preview-content a:hover {
+    text-decoration: underline;
+}
+
+.preview-content ul,
+.preview-content ol {
+    margin-bottom: 1rem;
+    padding-left: 2rem;
+}
+
+.preview-content li {
+    margin-bottom: 0.5rem;
+    line-height: 1.7;
+}
+
+.preview-content code {
+    background-color: var(--code-bg);
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.875em;
+    color: var(--text-primary);
+}
+
+.preview-content pre {
+    background-color: var(--bg-tertiary);
+    padding: 1rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+}
+
+.preview-content pre code {
+    background-color: transparent;
+    padding: 0;
+    font-size: 0.875rem;
+}
+
+.preview-content blockquote {
+    border-left: 4px solid var(--accent-color);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.preview-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+.preview-content table th,
+.preview-content table td {
+    border: 1px solid var(--border-color);
+    padding: 0.5rem;
+    text-align: left;
+}
+
+.preview-content table th {
+    background-color: var(--bg-secondary);
+    font-weight: 600;
+}
+
+.preview-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.preview-content hr {
+    border: none;
+    border-top: 2px solid var(--border-color);
+    margin: 2rem 0;
+}
+
+/* Task lists */
+.preview-content input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
+/* Resizer */
+.resizer {
+    width: 4px;
+    background-color: var(--border-color);
+    cursor: col-resize;
+    transition: background-color 0.2s;
+}
+
+.resizer:hover {
+    background-color: var(--accent-color);
+}
+
+/* Footer */
+.footer {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column;
+    }
+
+    .preview-pane {
+        border-left: none;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .resizer {
+        display: none;
+    }
+
+    .toolbar {
+        padding: 0.5rem 1rem;
+    }
+
+    .toolbar-group {
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .logo {
+        font-size: 1.25rem;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.preview-content {
+    animation: fadeIn 0.3s ease;
+}
