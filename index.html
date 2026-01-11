@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="A modern markdown editor with live preview, syntax highlighting, and export features">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com 'unsafe-inline'; style-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:;">
     <title>Markdown Editor - Live Preview & Export</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
 
     <!-- Styles -->
     <link rel="stylesheet" href="styles.css">
@@ -21,6 +25,9 @@
     <!-- Turndown.js for HTML to Markdown conversion -->
     <script src="https://cdn.jsdelivr.net/npm/turndown@7.1.2/dist/turndown.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/turndown-plugin-gfm@1.0.2/dist/turndown-plugin-gfm.js"></script>
+
+    <!-- DOMPurify for XSS protection -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -134,12 +141,14 @@
         <footer class="footer">
             <div class="footer-content">
                 <div class="footer-left">
-                    <span>Built with ❤️ by <a href="https://www.emrullahcelik.com/" target="_blank" rel="noopener noreferrer">Emrullah Celik</a></span>
+                    <span>© 2026 <a href="https://www.emrullahcelik.com/" target="_blank" rel="noopener noreferrer">Emrullah Celik</a></span>
                     <span class="footer-separator">•</span>
-                    <span>Powered by <a href="https://marked.js.org/" target="_blank" rel="noopener noreferrer">Marked.js</a> & <a href="https://highlightjs.org/" target="_blank" rel="noopener noreferrer">Highlight.js</a></span>
+                    <a href="https://github.com/Emrullah007/markdown-editor" target="_blank" rel="noopener noreferrer">GitHub</a>
+                    <span class="footer-separator">•</span>
+                    <a href="https://github.com/Emrullah007/markdown-editor/blob/main/README.md" target="_blank" rel="noopener noreferrer">Documentation</a>
                 </div>
                 <div class="footer-right">
-                    <span class="keyboard-hint">💾 Save: <kbd>Ctrl</kbd>+<kbd>S</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>S</kbd> (Mac)</span>
+                    <span class="keyboard-hint">💾 <kbd>Ctrl</kbd>+<kbd>S</kbd> / <kbd>⌘</kbd>+<kbd>S</kbd> to save</span>
                 </div>
             </div>
         </footer>

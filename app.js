@@ -112,7 +112,13 @@ class MarkdownEditor {
     updatePreview() {
         const markdown = this.editor.value;
         const html = markdownParser.parse(markdown);
-        this.preview.innerHTML = html;
+        // Sanitize HTML to prevent XSS attacks
+        const cleanHtml = DOMPurify.sanitize(html, {
+            ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'strong', 'em', 'del', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'img', 'br', 'hr', 'span', 'div', 'input'],
+            ALLOWED_ATTR: ['href', 'src', 'alt', 'class', 'type', 'checked', 'disabled', 'title', 'id', 'target', 'rel'],
+            ALLOW_DATA_ATTR: false
+        });
+        this.preview.innerHTML = cleanHtml;
     }
 
     toggleMode() {
@@ -159,7 +165,13 @@ class MarkdownEditor {
         // Convert to markdown and update preview
         const markdown = this.richTextEditor.getMarkdown();
         const html = markdownParser.parse(markdown);
-        this.preview.innerHTML = html;
+        // Sanitize HTML to prevent XSS attacks
+        const cleanHtml = DOMPurify.sanitize(html, {
+            ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'strong', 'em', 'del', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'img', 'br', 'hr', 'span', 'div', 'input'],
+            ALLOWED_ATTR: ['href', 'src', 'alt', 'class', 'type', 'checked', 'disabled', 'title', 'id', 'target', 'rel'],
+            ALLOW_DATA_ATTR: false
+        });
+        this.preview.innerHTML = cleanHtml;
 
         // Schedule auto-save
         this.scheduleAutoSave();
