@@ -29,27 +29,6 @@ This project implements several security measures:
   - Highlight.js (Syntax highlighting)
   - DOMPurify (XSS protection)
 
-## Reporting a Vulnerability
-
-If you discover a security vulnerability, please report it by:
-
-1. **DO NOT** open a public GitHub issue
-2. Email the maintainer at: security@emrullahcelik.com (or open a private security advisory on GitHub)
-3. Include:
-   - Description of the vulnerability
-   - Steps to reproduce
-   - Potential impact
-   - Suggested fix (if any)
-
-### Response Timeline
-- **Initial Response**: Within 48 hours
-- **Status Update**: Within 7 days
-- **Fix Timeline**: Critical issues within 14 days, others within 30 days
-
-### What to Expect
-- **Accepted**: We'll work on a fix and credit you in the release notes (unless you prefer to remain anonymous)
-- **Declined**: We'll explain why the reported issue isn't considered a vulnerability
-
 ## Security Best Practices for Users
 
 1. **Keep browsers updated**: Use the latest version of modern browsers
