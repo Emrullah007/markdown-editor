@@ -502,13 +502,13 @@ console.log(greet('World'));
     }
 
     toggleEditorFullscreen() {
-        const editorPane = document.querySelector('.editor-pane');
+        const container = document.querySelector('.container');
         const btn = document.getElementById('editorFullscreenBtn');
 
-        editorPane.classList.toggle('fullscreen');
+        container.classList.toggle('editor-fullscreen');
 
-        if (editorPane.classList.contains('fullscreen')) {
-            btn.textContent = '⛶'; // Exit fullscreen icon
+        if (container.classList.contains('editor-fullscreen')) {
+            btn.textContent = '✕'; // Exit fullscreen icon
             btn.title = 'Exit fullscreen';
         } else {
             btn.textContent = '⛶'; // Fullscreen icon
@@ -517,13 +517,13 @@ console.log(greet('World'));
     }
 
     togglePreviewFullscreen() {
-        const previewPane = document.querySelector('.preview-pane');
+        const container = document.querySelector('.container');
         const btn = document.getElementById('previewFullscreenBtn');
 
-        previewPane.classList.toggle('fullscreen');
+        container.classList.toggle('preview-fullscreen');
 
-        if (previewPane.classList.contains('fullscreen')) {
-            btn.textContent = '⛶'; // Exit fullscreen icon
+        if (container.classList.contains('preview-fullscreen')) {
+            btn.textContent = '✕'; // Exit fullscreen icon
             btn.title = 'Exit fullscreen';
         } else {
             btn.textContent = '⛶'; // Fullscreen icon

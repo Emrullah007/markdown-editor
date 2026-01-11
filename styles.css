@@ -506,8 +506,8 @@ body.dark-mode .keyboard-hint:hover {
 }
 
 /* Fullscreen mode */
-.editor-pane.fullscreen,
-.preview-pane.fullscreen {
+.container.editor-fullscreen .editor-pane,
+.container.preview-fullscreen .preview-pane {
     position: fixed;
     top: 0;
     left: 0;
@@ -517,15 +517,57 @@ body.dark-mode .keyboard-hint:hover {
     height: 100% !important;
     z-index: 1000;
     flex: none !important;
+    padding-top: 0;
 }
 
-.editor-pane.fullscreen ~ .resizer,
-.editor-pane.fullscreen ~ .preview-pane {
+.container.editor-fullscreen .header,
+.container.editor-fullscreen .toolbar,
+.container.editor-fullscreen .rich-text-toolbar-wrapper,
+.container.editor-fullscreen .preview-pane,
+.container.editor-fullscreen .resizer,
+.container.editor-fullscreen .footer {
     display: none;
 }
 
-.preview-pane.fullscreen ~ .resizer {
+.container.preview-fullscreen .header,
+.container.preview-fullscreen .toolbar,
+.container.preview-fullscreen .rich-text-toolbar-wrapper,
+.container.preview-fullscreen .editor-pane,
+.container.preview-fullscreen .resizer,
+.container.preview-fullscreen .footer {
     display: none;
+}
+
+/* Show toolbars in editor fullscreen mode */
+.container.editor-fullscreen .toolbar,
+.container.editor-fullscreen .rich-text-toolbar-wrapper {
+    display: block !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1001;
+}
+
+.container.editor-fullscreen .rich-text-toolbar-wrapper {
+    top: 60px; /* Below main toolbar */
+}
+
+.container.editor-fullscreen .editor-pane {
+    padding-top: 120px; /* Space for both toolbars */
+}
+
+.container.editor-fullscreen .editor-pane .pane-header {
+    position: fixed;
+    top: 120px;
+    left: 0;
+    right: 0;
+    z-index: 1001;
+}
+
+.container.editor-fullscreen .editor-textarea,
+.container.editor-fullscreen .rich-text-editor {
+    padding-top: 60px; /* Space for pane header */
 }
 
 /* Scrollbar styling */
