@@ -296,7 +296,7 @@ describe('FindReplace', () => {
         it('should update remaining match positions', () => {
             findReplace.replaceCurrent('hi');
             // 'hi' is 2 chars shorter than 'hello' (5 chars), so diff is -3
-            expect(findReplace.matches[0].start).toBe(10 - 3);
+            expect(findReplace.matches[0].start).toBe(13 - 3);
         });
 
         it('should remove replaced match from matches array', () => {

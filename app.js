@@ -37,6 +37,10 @@ const DOMPURIFY_CONFIG = {
     ALLOW_DATA_ATTR: false
 };
 
+if (typeof window !== 'undefined') {
+    window.__markdownEditorReady = false;
+}
+
 /**
  * Main Markdown Editor class
  * Handles all editor functionality including markdown/rich text editing,
@@ -181,6 +185,11 @@ class MarkdownEditor {
         this.spellChecker = new SpellChecker(this);
 
         this.updatePreview();
+
+        if (typeof window !== 'undefined') {
+            window.__markdownEditorReady = true;
+            window.dispatchEvent(new Event('markdownEditorReady'));
+        }
     }
 
     setupEventListeners() {
@@ -286,7 +295,7 @@ class MarkdownEditor {
             }
 
             // Ctrl+Shift+Z or Cmd+Shift+Z for redo (also Ctrl+Y)
-            if ((e.ctrlKey || e.metaKey) && (e.shiftKey && e.key === 'Z' || e.key === 'y')) {
+            if ((e.ctrlKey || e.metaKey) && ((e.shiftKey && (e.key === 'Z' || e.key === 'z')) || e.key === 'y')) {
                 e.preventDefault();
                 this.redo();
                 return;
@@ -1120,6 +1129,8 @@ console.log(greet('World'));
 }
 
 // Initialize the app when DOM is ready
+let deferredInstallPrompt = null;
+
 document.addEventListener('DOMContentLoaded', () => {
     new MarkdownEditor();
     
@@ -1146,11 +1157,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Handle PWA install prompt
-    let deferredPrompt;
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
-        deferredPrompt = e;
-        showInstallButton(deferredPrompt);
+        deferredInstallPrompt = e;
+        showInstallButton();
     });
 });
 
@@ -1172,9 +1182,20 @@ function showUpdateNotification() {
  * Show install button when PWA can be installed
  * @param {Event} deferredPrompt - The beforeinstallprompt event
  */
-function showInstallButton(deferredPrompt) {
+function showInstallButton() {
     // Create install button in header
     const headerActions = document.querySelector('.header-actions');
+    if (!headerActions) {
+        return;
+    }
+    const existingButtons = document.querySelectorAll('#installBtn');
+    if (existingButtons.length > 0) {
+        // Clean up any duplicates created by older versions.
+        for (let i = 1; i < existingButtons.length; i++) {
+            existingButtons[i].remove();
+        }
+        return;
+    }
     
     const installBtn = document.createElement('button');
     installBtn.id = 'installBtn';
@@ -1183,15 +1204,18 @@ function showInstallButton(deferredPrompt) {
     installBtn.innerHTML = '📲 Install';
     
     installBtn.addEventListener('click', async () => {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
+        if (!deferredInstallPrompt) {
+            return;
+        }
+        deferredInstallPrompt.prompt();
+        const { outcome } = await deferredInstallPrompt.userChoice;
         
         if (outcome === 'accepted') {
             console.log('PWA installed');
             installBtn.remove();
         }
         
-        deferredPrompt = null;
+        deferredInstallPrompt = null;
     });
     
     // Insert at the beginning

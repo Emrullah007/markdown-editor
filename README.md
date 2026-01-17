@@ -5,7 +5,7 @@ A modern, feature-rich markdown and rich text editor with live preview, syntax h
 ![Markdown Editor](https://img.shields.io/badge/Editor-Markdown-blue)
 ![Rich Text](https://img.shields.io/badge/Editor-Rich%20Text-purple)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Version](https://img.shields.io/badge/version-1.2.0-brightgreen)
+![Version](https://img.shields.io/badge/version-1.2.1-brightgreen)
 ![PWA](https://img.shields.io/badge/PWA-Installable-blue)
 
 ## Features

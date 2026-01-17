@@ -205,3 +205,7 @@ class HistoryManager {
  * @type {HistoryManager}
  */
 const historyManager = new HistoryManager();
+
+if (typeof globalThis !== 'undefined') {
+    globalThis.HistoryManager = HistoryManager;
+}

@@ -4,9 +4,9 @@
  * @version 1.0.0
  */
 
-const CACHE_NAME = 'markdown-editor-v1.2.0';
-const STATIC_CACHE = 'markdown-editor-static-v1.2.0';
-const DYNAMIC_CACHE = 'markdown-editor-dynamic-v1.2.0';
+const CACHE_NAME = 'markdown-editor-v1.2.1';
+const STATIC_CACHE = 'markdown-editor-static-v1.2.1';
+const DYNAMIC_CACHE = 'markdown-editor-dynamic-v1.2.1';
 
 // Files to cache for offline use
 const STATIC_ASSETS = [

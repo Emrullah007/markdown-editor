@@ -1,6 +1,6 @@
 {
   "name": "markdown-editor",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A modern, interactive markdown editor with live preview, syntax highlighting, and export capabilities",
   "main": "index.html",
   "scripts": {

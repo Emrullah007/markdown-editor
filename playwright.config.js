@@ -40,7 +40,7 @@ module.exports = defineConfig({
 
     /* Run local server before starting tests */
     webServer: {
-        command: 'npx http-server -p 8080',
+        command: 'python3 -m http.server 8080',
         url: 'http://localhost:8080',
         reuseExistingServer: !process.env.CI,
         timeout: 120 * 1000,

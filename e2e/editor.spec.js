@@ -1,11 +1,15 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
 
+async function gotoEditor(page) {
+    await page.goto('/');
+    await page.waitForSelector('#editor');
+    await page.waitForFunction(() => window.__markdownEditorReady === true);
+}
+
 test.describe('Markdown Editor', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto('/');
-        // Wait for editor to load
-        await page.waitForSelector('#editor');
+        await gotoEditor(page);
     });
 
     test('should load the editor', async ({ page }) => {
@@ -68,7 +72,7 @@ test.describe('Markdown Editor', () => {
 
 test.describe('Theme Switching', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto('/');
+        await gotoEditor(page);
     });
 
     test('should switch themes', async ({ page }) => {
@@ -94,7 +98,7 @@ test.describe('Theme Switching', () => {
 
 test.describe('Find and Replace', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto('/');
+        await gotoEditor(page);
         // Set some content
         await page.locator('#editor').fill('Hello world. Hello again. Goodbye world.');
     });
@@ -138,7 +142,7 @@ test.describe('Find and Replace', () => {
 
 test.describe('Templates', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto('/');
+        await gotoEditor(page);
     });
 
     test('should open templates modal', async ({ page }) => {
@@ -183,11 +187,12 @@ test.describe('Templates', () => {
 
 test.describe('Export Functions', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto('/');
+        await gotoEditor(page);
         await page.locator('#editor').fill('# Test Export\n\nSome content here.');
     });
 
-    test('should copy markdown to clipboard', async ({ page }) => {
+    test('should copy markdown to clipboard', async ({ page }, testInfo) => {
+        test.skip(['firefox', 'webkit'].includes(testInfo.project.name), 'Clipboard read is not supported.');
         // Grant clipboard permissions
         await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
         
@@ -198,7 +203,8 @@ test.describe('Export Functions', () => {
         expect(clipboardText).toContain('# Test Export');
     });
 
-    test('should copy HTML to clipboard', async ({ page }) => {
+    test('should copy HTML to clipboard', async ({ page }, testInfo) => {
+        test.skip(['firefox', 'webkit'].includes(testInfo.project.name), 'Clipboard read is not supported.');
         await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
         
         await page.click('#copyHtmlBtn');
@@ -210,7 +216,7 @@ test.describe('Export Functions', () => {
 
 test.describe('Undo/Redo', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto('/');
+        await gotoEditor(page);
     });
 
     test('should undo changes', async ({ page }) => {
@@ -255,7 +261,7 @@ test.describe('Undo/Redo', () => {
 
 test.describe('Focus Mode', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto('/');
+        await gotoEditor(page);
     });
 
     test('should toggle focus mode', async ({ page }) => {
@@ -273,7 +279,7 @@ test.describe('Focus Mode', () => {
 
 test.describe('Statistics Panel', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto('/');
+        await gotoEditor(page);
         await page.locator('#editor').fill('This is a test. This has two sentences.');
     });
 
@@ -292,7 +298,7 @@ test.describe('Statistics Panel', () => {
         await page.waitForTimeout(500);
         
         // Check word count
-        await expect(page.locator('#statWords')).toContainText('9');
+        await expect(page.locator('#statWords')).toContainText('8');
         
         // Check sentence count
         await expect(page.locator('#statSentences')).toContainText('2');
@@ -301,7 +307,7 @@ test.describe('Statistics Panel', () => {
 
 test.describe('Auto-pair', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto('/');
+        await gotoEditor(page);
         await page.locator('#editor').fill('');
     });
 
@@ -330,7 +336,7 @@ test.describe('Auto-pair', () => {
 test.describe('Responsive Design', () => {
     test('should work on mobile viewport', async ({ page }) => {
         await page.setViewportSize({ width: 375, height: 667 });
-        await page.goto('/');
+        await gotoEditor(page);
         
         // Editor should be visible
         await expect(page.locator('#editor')).toBeVisible();
