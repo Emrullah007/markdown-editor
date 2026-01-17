@@ -24,19 +24,29 @@ This is a modern, feature-rich markdown and rich text editor built with vanilla 
 ```
 markdown-editor/
 ├── index.html              # Main HTML structure, includes all library CDNs
-├── styles.css              # Complete styling with dark mode, responsive design
+├── styles.css              # Complete styling with 8 themes, responsive design
 ├── app.js                  # Core application logic, state management, UI controls
 ├── markdown-parser.js      # Markdown parsing wrapper using Marked.js
 ├── rich-text-editor.js     # Rich text editor functionality and toolbar
 ├── image-storage.js        # IndexedDB wrapper for efficient image storage
 ├── history-manager.js      # Undo/redo history management
-├── package.json            # Project metadata
+├── find-replace.js         # Find & Replace functionality with regex support
+├── pdf-export.js           # PDF export using jsPDF and html2canvas
+├── tests/                  # Unit tests
+│   ├── setup.js            # Jest configuration and mocks
+│   ├── history-manager.test.js
+│   ├── find-replace.test.js
+│   └── image-storage.test.js
+├── docs/                   # Documentation
+│   ├── VERCEL_SPEED_INSIGHTS.md
+│   └── VERCEL_WEB_ANALYTICS.md
+├── package.json            # Project metadata and test scripts
+├── vercel.json             # Vercel deployment config
 ├── LICENSE                 # MIT License
 ├── CONTRIBUTING.md         # Contribution guidelines
 ├── SECURITY.md             # Security policy
-├── .gitignore              # Git ignore rules
 ├── README.md               # User-facing documentation
-└── Claude.md               # This file - AI context
+└── Claude.md               # This file - AI context & changelog
 ```
 
 ## Key Files and Their Responsibilities
@@ -213,18 +223,99 @@ When making changes, test:
 9. **Image handling** - Paste, drag-drop, upload all work
 10. **Keyboard shortcuts** - Ctrl/Cmd+S triggers download
 
-## Future Enhancement Ideas
+## Changelog
 
-Based on the roadmap in README.md:
-- PDF export capability
-- Import markdown files from disk
-- Multiple file/tab support
-- Custom theme builder
-- Vim/Emacs keybindings option
-- Markdown templates library
-- Word count and reading time statistics
-- Collaborative editing (requires backend)
-- Cloud sync (requires backend)
+### v1.2.0 (January 2026)
+Major feature update with writing enhancements and PWA support:
+
+**New Features:**
+- ✅ **Markdown Syntax Highlighting** - Real-time syntax coloring in editor textarea
+- ✅ **Focus Mode** - Distraction-free writing with paragraph highlighting (Ctrl+Shift+F)
+- ✅ **Typewriter Mode** - Keep cursor vertically centered while typing (Ctrl+Shift+T)
+- ✅ **Auto-pair Characters** - Automatically close brackets, quotes, and markdown syntax
+- ✅ **Spell Checker** - Toggle browser spell checking on/off
+- ✅ **Statistics Panel** - Detailed document analytics (words, sentences, reading level)
+- ✅ **Markdown Templates** - 10 built-in templates (Meeting Notes, Blog Post, README, etc.)
+- ✅ **PWA Support** - Install as app, offline support with service worker
+
+**Code Quality:**
+- ✅ **E2E Tests** - Playwright test suite for full user flow testing
+
+**Files Added:**
+- `syntax-highlighter.js` - Markdown syntax highlighting
+- `focus-mode.js` - Focus mode functionality
+- `typewriter-mode.js` - Typewriter mode functionality
+- `auto-pair.js` - Auto-pair characters
+- `spell-checker.js` - Spell check toggle
+- `statistics-panel.js` - Detailed statistics
+- `templates.js` - Template library
+- `sw.js` - Service worker for PWA
+- `manifest.json` - PWA manifest
+- `playwright.config.js` - Playwright configuration
+- `e2e/editor.spec.js` - E2E test suite
+
+### v1.1.0 (January 2026)
+Major feature update with extensive enhancements:
+
+**New Features:**
+- ✅ **Find & Replace** - Full search with regex, case-sensitive, and whole word options
+- ✅ **PDF Export** - Download documents as PDF using jsPDF and html2canvas
+- ✅ **Custom Themes** - 8 beautiful themes (Light, Dark, Ocean, Forest, Sunset, Lavender, Rose, Mint)
+- ✅ **Lazy Loading Images** - IntersectionObserver-based lazy loading for better performance
+- ✅ **Keyboard Shortcuts** - Ctrl+F (Find), Ctrl+H (Find & Replace)
+
+**Code Quality:**
+- ✅ **JSDoc Comments** - All JavaScript files documented with JSDoc
+- ✅ **Unit Tests** - Jest test suite for HistoryManager, FindReplace, and ImageStorage
+- ✅ **Accessibility** - Improved keyboard navigation in rich text toolbar
+
+**Files Added:**
+- `find-replace.js` - Find & Replace functionality
+- `pdf-export.js` - PDF export module
+- `tests/setup.js` - Jest configuration
+- `tests/history-manager.test.js` - HistoryManager unit tests
+- `tests/find-replace.test.js` - FindReplace unit tests
+- `tests/image-storage.test.js` - ImageStorage unit tests
+
+### v1.0.0 (Initial Release)
+- Dual editor modes (Markdown & Rich Text)
+- Live preview with GitHub Flavored Markdown
+- Auto-save to localStorage
+- Undo/Redo with history management
+- Dark mode with system preference detection
+- Image support with IndexedDB storage
+- Export as Markdown, HTML
+- Resizable split-pane layout
+- Fullscreen mode
+- Word count statistics
+
+---
+
+## Roadmap
+
+### ✅ Completed (v1.2.0)
+| Feature | Description | Status |
+|---------|-------------|--------|
+| Markdown Syntax Highlighting | Highlight markdown syntax in editor textarea | ✅ Done |
+| Focus Mode | Dim everything except current paragraph | ✅ Done |
+| Spell Checker | Integrated spell checking toggle | ✅ Done |
+| Auto-pair Characters | Auto-close brackets, quotes, markdown syntax | ✅ Done |
+| Typewriter Mode | Keep cursor vertically centered while typing | ✅ Done |
+| Statistics Panel | Detailed stats (paragraphs, sentences, reading level) | ✅ Done |
+| PWA/Offline Support | Service worker for offline usage | ✅ Done |
+| Markdown Templates | Quick-insert templates (10 templates) | ✅ Done |
+| E2E Tests | Playwright tests for full user flows | ✅ Done |
+
+### 🚀 Future Considerations
+| Feature | Description | Status |
+|---------|-------------|--------|
+| Multiple Tabs/Files | Work on multiple documents simultaneously | 🔲 Planned |
+| Custom Theme Builder | Let users create their own themes | 🔲 Planned |
+| Table Editor | Visual drag-and-drop table editing | 🔲 Planned |
+| Vim/Emacs Keybindings | Optional keybinding modes | 🔲 Planned |
+| Export to Word | Export documents as .docx | 🔲 Planned |
+| Collaborative Editing | Real-time collaboration (requires backend) | 🔲 Future |
+| Cloud Sync | Save to cloud storage (requires backend) | 🔲 Future |
 
 ## Troubleshooting
 

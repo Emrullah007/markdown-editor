@@ -77,18 +77,39 @@ npx http-server
 - Validate user input before processing
 - Follow Content Security Policy guidelines
 
-## Testing Checklist
+## Testing
+
+### Running Unit Tests
+
+```bash
+# Install dependencies
+npm install
+
+# Run tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run with coverage
+npm run test:coverage
+```
+
+### Testing Checklist
 
 Before submitting a pull request, please verify:
 
+- [ ] All unit tests pass (`npm test`)
 - [ ] Works in Chrome, Firefox, and Safari
-- [ ] Dark mode functions correctly
+- [ ] All 8 themes function correctly
 - [ ] Mobile responsive design maintained
 - [ ] Auto-save works as expected
-- [ ] Export features (MD/HTML) work correctly
+- [ ] Export features (MD/HTML/PDF) work correctly
 - [ ] Rich text and markdown modes both function properly
+- [ ] Find & Replace works in both modes
 - [ ] Images can be pasted, dragged, and uploaded
 - [ ] Tables render correctly
+- [ ] Keyboard shortcuts work (Ctrl+F, Ctrl+H, Ctrl+Z, etc.)
 - [ ] No console errors
 - [ ] No security vulnerabilities introduced
 
@@ -97,11 +118,22 @@ Before submitting a pull request, please verify:
 ```
 markdown-editor/
 ├── index.html              # Main HTML structure
+├── styles.css              # All styling with 8 themes
 ├── app.js                  # Core application logic
 ├── markdown-parser.js      # Markdown parsing utilities
 ├── rich-text-editor.js     # Rich text editor functionality
-├── styles.css              # All styling
+├── image-storage.js        # IndexedDB image storage
+├── history-manager.js      # Undo/redo history management
+├── find-replace.js         # Find & Replace functionality
+├── pdf-export.js           # PDF export module
+├── tests/                  # Unit tests (Jest)
+│   ├── setup.js            # Test configuration
+│   ├── history-manager.test.js
+│   ├── find-replace.test.js
+│   └── image-storage.test.js
+├── package.json            # Project metadata & scripts
 ├── README.md               # Project documentation
+├── Claude.md               # AI context & changelog
 ├── LICENSE                 # MIT License
 └── CONTRIBUTING.md         # This file
 ```

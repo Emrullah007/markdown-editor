@@ -112,6 +112,27 @@ class MarkdownEditor {
         // Current theme
         this.currentTheme = 'light';
 
+        // Syntax highlighter
+        this.syntaxHighlighter = null;
+
+        // Focus mode
+        this.focusMode = null;
+
+        // Auto-pair
+        this.autoPair = null;
+
+        // Typewriter mode
+        this.typewriterMode = null;
+
+        // Statistics panel
+        this.statisticsPanel = null;
+
+        // Templates
+        this.templates = null;
+
+        // Spell checker
+        this.spellChecker = null;
+
         // Initialize
         this.init();
     }
@@ -135,6 +156,29 @@ class MarkdownEditor {
 
         // Initialize PDF Export
         this.pdfExport = new PDFExport(this);
+
+        // Initialize Syntax Highlighter for markdown editor
+        this.syntaxHighlighter = new SyntaxHighlighter(this.editor);
+
+        // Initialize Focus Mode
+        this.focusMode = new FocusMode(this);
+        this.focusMode.loadPreference();
+
+        // Initialize Auto-pair for markdown editor
+        this.autoPair = new AutoPair(this.editor);
+
+        // Initialize Typewriter Mode
+        this.typewriterMode = new TypewriterMode(this);
+        this.typewriterMode.loadPreference();
+
+        // Initialize Statistics Panel
+        this.statisticsPanel = new StatisticsPanel(this);
+
+        // Initialize Templates
+        this.templates = new Templates(this);
+
+        // Initialize Spell Checker
+        this.spellChecker = new SpellChecker(this);
 
         this.updatePreview();
     }
@@ -397,8 +441,13 @@ class MarkdownEditor {
             const markdown = this.editor.value;
             await this.richTextEditor.setContent(markdown);
 
+            // Disable syntax highlighting in rich text mode
+            if (this.syntaxHighlighter) {
+                this.syntaxHighlighter.disable();
+            }
+
             // Toggle visibility
-            this.editor.style.display = 'none';
+            this.editor.parentNode.style.display = 'none';
             this.richTextEditorElement.style.display = 'block';
             this.richTextToolbar.style.display = 'block';
 
@@ -414,8 +463,14 @@ class MarkdownEditor {
             const markdown = this.richTextEditor.getMarkdown();
             this.editor.value = markdown;
 
+            // Enable syntax highlighting in markdown mode
+            if (this.syntaxHighlighter) {
+                this.syntaxHighlighter.enable();
+                this.syntaxHighlighter.update();
+            }
+
             // Toggle visibility
-            this.editor.style.display = 'block';
+            this.editor.parentNode.style.display = 'flex';
             this.richTextEditorElement.style.display = 'none';
             this.richTextToolbar.style.display = 'none';
 
@@ -538,6 +593,14 @@ class MarkdownEditor {
             historyManager.pushState(this.editor.value, true);
             this.updateUndoRedoButtons();
             this.updateWordCount();
+            
+            // Update syntax highlighting after content is loaded
+            // (deferred to allow DOM to settle)
+            setTimeout(() => {
+                if (this.syntaxHighlighter) {
+                    this.syntaxHighlighter.update();
+                }
+            }, 0);
         } catch (error) {
             console.error('Error loading from localStorage:', error);
             this.editor.value = this.getDefaultContent();
@@ -726,6 +789,10 @@ console.log(greet('World'));
         if (confirm('Are you sure you want to clear the editor? This action cannot be undone.')) {
             if (this.currentMode === 'markdown') {
                 this.editor.value = '';
+                // Update syntax highlighting
+                if (this.syntaxHighlighter) {
+                    this.syntaxHighlighter.update();
+                }
             } else {
                 this.richTextEditorElement.innerHTML = '';
             }
@@ -747,6 +814,10 @@ console.log(greet('World'));
             if (this.currentMode === 'markdown') {
                 this.editor.value = previousState;
                 this.updatePreview();
+                // Update syntax highlighting
+                if (this.syntaxHighlighter) {
+                    this.syntaxHighlighter.update();
+                }
             } else {
                 // In rich text mode, we need to update the rich text editor
                 this.richTextEditorElement.innerHTML = markdownParser.parse(previousState);
@@ -765,6 +836,10 @@ console.log(greet('World'));
             if (this.currentMode === 'markdown') {
                 this.editor.value = nextState;
                 this.updatePreview();
+                // Update syntax highlighting
+                if (this.syntaxHighlighter) {
+                    this.syntaxHighlighter.update();
+                }
             } else {
                 // In rich text mode, we need to update the rich text editor
                 this.richTextEditorElement.innerHTML = markdownParser.parse(nextState);
@@ -884,6 +959,11 @@ console.log(greet('World'));
                 // Add to history
                 historyManager.pushState(text, true);
                 this.updateUndoRedoButtons();
+                
+                // Update syntax highlighting
+                if (this.syntaxHighlighter) {
+                    this.syntaxHighlighter.update();
+                }
 
                 this.updateSaveStatus('File imported');
                 setTimeout(() => {
@@ -1042,4 +1122,78 @@ console.log(greet('World'));
 // Initialize the app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     new MarkdownEditor();
+    
+    // Register service worker for PWA
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+                console.log('Service Worker registered:', registration.scope);
+                
+                // Check for updates
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            // New content available, show update notification
+                            showUpdateNotification();
+                        }
+                    });
+                });
+            })
+            .catch((error) => {
+                console.log('Service Worker registration failed:', error);
+            });
+    }
+    
+    // Handle PWA install prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        showInstallButton(deferredPrompt);
+    });
 });
+
+/**
+ * Show update notification when new service worker is available
+ */
+function showUpdateNotification() {
+    const notification = document.createElement('div');
+    notification.className = 'update-notification';
+    notification.innerHTML = `
+        <span>✨ New version available!</span>
+        <button onclick="window.location.reload()">Update</button>
+        <button onclick="this.parentElement.remove()">×</button>
+    `;
+    document.body.appendChild(notification);
+}
+
+/**
+ * Show install button when PWA can be installed
+ * @param {Event} deferredPrompt - The beforeinstallprompt event
+ */
+function showInstallButton(deferredPrompt) {
+    // Create install button in header
+    const headerActions = document.querySelector('.header-actions');
+    
+    const installBtn = document.createElement('button');
+    installBtn.id = 'installBtn';
+    installBtn.className = 'btn btn-icon install-btn';
+    installBtn.title = 'Install App';
+    installBtn.innerHTML = '📲 Install';
+    
+    installBtn.addEventListener('click', async () => {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        
+        if (outcome === 'accepted') {
+            console.log('PWA installed');
+            installBtn.remove();
+        }
+        
+        deferredPrompt = null;
+    });
+    
+    // Insert at the beginning
+    headerActions.insertBefore(installBtn, headerActions.firstChild);
+}

@@ -5,7 +5,8 @@ A modern, feature-rich markdown and rich text editor with live preview, syntax h
 ![Markdown Editor](https://img.shields.io/badge/Editor-Markdown-blue)
 ![Rich Text](https://img.shields.io/badge/Editor-Rich%20Text-purple)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Version](https://img.shields.io/badge/version-1.1.0-brightgreen)
+![Version](https://img.shields.io/badge/version-1.2.0-brightgreen)
+![PWA](https://img.shields.io/badge/PWA-Installable-blue)
 
 ## Features
 
@@ -19,6 +20,16 @@ A modern, feature-rich markdown and rich text editor with live preview, syntax h
 - **Responsive Design** - Optimized for desktop, tablet, and mobile devices
 - **Fullscreen Mode** - Expand editor or preview to fullscreen for focused work
 - **Word Count** - Live statistics showing word count, character count, and reading time
+- **PWA Support** - Install as a standalone app, works offline
+
+### Writing Enhancements
+- **Markdown Syntax Highlighting** - Real-time syntax coloring in the editor
+- **Focus Mode** - Distraction-free writing with paragraph highlighting
+- **Typewriter Mode** - Keep cursor vertically centered while typing
+- **Auto-pair Characters** - Automatically close brackets, quotes, and markdown syntax
+- **Spell Checker** - Toggle browser spell checking on/off
+- **Statistics Panel** - Detailed document analytics with reading level
+- **Markdown Templates** - 10 built-in templates for common document types
 
 ### Import/Export Options
 - Import Markdown files (.md, .markdown, .txt) from disk
@@ -89,6 +100,8 @@ No build process or dependencies installation required! Just open and use.
 | `Ctrl+Z` / `⌘+Z` | Undo |
 | `Ctrl+Shift+Z` / `⌘+Shift+Z` | Redo |
 | `Ctrl+Y` / `⌘+Y` | Redo (alternative) |
+| `Ctrl+Shift+F` / `⌘+Shift+F` | Toggle Focus Mode |
+| `Ctrl+Shift+T` / `⌘+Shift+T` | Toggle Typewriter Mode |
 | `Ctrl+B` / `⌘+B` | Bold (Rich Text mode) |
 | `Ctrl+I` / `⌘+I` | Italic (Rich Text mode) |
 | `Ctrl+U` / `⌘+U` | Underline (Rich Text mode) |
@@ -161,14 +174,28 @@ markdown-editor/
 ├── history-manager.js      # Undo/redo history management
 ├── find-replace.js         # Find & Replace functionality
 ├── pdf-export.js           # PDF export functionality
-├── package.json            # Project metadata and test scripts
-├── tests/                  # Unit tests
-│   ├── setup.js           # Jest test setup
+├── syntax-highlighter.js   # Markdown syntax highlighting
+├── focus-mode.js           # Focus mode functionality
+├── typewriter-mode.js      # Typewriter mode functionality
+├── auto-pair.js            # Auto-pair characters
+├── spell-checker.js        # Spell check toggle
+├── statistics-panel.js     # Detailed statistics panel
+├── templates.js            # Markdown templates library
+├── sw.js                   # Service worker for PWA
+├── manifest.json           # PWA manifest
+├── package.json            # Project metadata and scripts
+├── playwright.config.js    # E2E test configuration
+├── tests/                  # Unit tests (Jest)
+│   ├── setup.js
 │   ├── history-manager.test.js
 │   ├── find-replace.test.js
 │   └── image-storage.test.js
+├── e2e/                    # E2E tests (Playwright)
+│   └── editor.spec.js
+├── docs/                   # Documentation
 ├── LICENSE                 # MIT License
 ├── CONTRIBUTING.md         # Contribution guidelines
+├── Claude.md               # AI context & changelog
 └── README.md               # This file
 ```
 
@@ -235,16 +262,27 @@ npm run test:watch
 npm run test:coverage
 ```
 
-## Future Enhancements
+## Roadmap
 
-Potential features for future versions:
+### ✅ Recently Added (v1.2.0)
+- Markdown Syntax Highlighting
+- Focus Mode
+- Typewriter Mode  
+- Auto-pair Characters
+- Spell Checker Toggle
+- Statistics Panel with Reading Level
+- Markdown Templates (10 templates)
+- PWA/Offline Support
+- E2E Tests with Playwright
+
+### 🚀 Future
 - Multiple file/tab support
 - Custom theme builder
+- Visual table editor
 - Vim/Emacs keybindings
-- Markdown templates library
+- Export to Word (.docx)
 - Collaborative editing (requires backend)
 - Cloud sync (requires backend)
-- Spell checker
 
 ## Contributing
 
