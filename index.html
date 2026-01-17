@@ -45,7 +45,7 @@
                     <p class="header-description">Write in Markdown or Rich Text • Live Preview • Export Anywhere</p>
                 </div>
                 <div class="header-actions">
-                    <button id="darkModeToggle" class="btn btn-icon" title="Toggle dark mode">
+                    <button id="darkModeToggle" class="btn btn-icon" title="Toggle dark mode" aria-label="Toggle dark mode">
                         🌙
                     </button>
                 </div>
@@ -55,26 +55,38 @@
         <!-- Toolbar -->
         <div class="toolbar">
             <div class="toolbar-group">
-                <button id="modeToggle" class="btn btn-primary" title="Toggle editor mode">
+                <button id="modeToggle" class="btn btn-primary" title="Toggle editor mode" aria-label="Switch to Rich Text editor mode">
                     📝 Switch to Rich Text
                 </button>
-                <button id="clearBtn" class="btn btn-secondary" title="Clear editor">
+                <button id="clearBtn" class="btn btn-secondary" title="Clear editor" aria-label="Clear all editor content">
                     🗑️ Clear
                 </button>
             </div>
 
             <div class="toolbar-group">
-                <button id="downloadMdBtn" class="btn" title="Download as Markdown">
-                    <span class="icon">⬇️</span> Download MD
+                <button id="undoBtn" class="btn btn-icon" title="Undo (Ctrl+Z)" aria-label="Undo last change" disabled>
+                    <span class="icon" aria-hidden="true">↶</span> Undo
                 </button>
-                <button id="downloadHtmlBtn" class="btn" title="Download as HTML">
-                    <span class="icon">⬇️</span> Download HTML
+                <button id="redoBtn" class="btn btn-icon" title="Redo (Ctrl+Shift+Z)" aria-label="Redo last undone change" disabled>
+                    <span class="icon" aria-hidden="true">↷</span> Redo
                 </button>
-                <button id="copyMdBtn" class="btn" title="Copy markdown to clipboard">
-                    <span class="icon">📋</span> Copy MD
+            </div>
+
+            <div class="toolbar-group">
+                <button id="importMdBtn" class="btn" title="Import Markdown file" aria-label="Import Markdown file from disk">
+                    <span class="icon" aria-hidden="true">📂</span> Import
                 </button>
-                <button id="copyHtmlBtn" class="btn" title="Copy HTML to clipboard">
-                    <span class="icon">📋</span> Copy HTML
+                <button id="downloadMdBtn" class="btn" title="Download as Markdown" aria-label="Download document as Markdown file">
+                    <span class="icon" aria-hidden="true">⬇️</span> Download MD
+                </button>
+                <button id="downloadHtmlBtn" class="btn" title="Download as HTML" aria-label="Download document as HTML file">
+                    <span class="icon" aria-hidden="true">⬇️</span> Download HTML
+                </button>
+                <button id="copyMdBtn" class="btn" title="Copy markdown to clipboard" aria-label="Copy markdown to clipboard">
+                    <span class="icon" aria-hidden="true">📋</span> Copy MD
+                </button>
+                <button id="copyHtmlBtn" class="btn" title="Copy HTML to clipboard" aria-label="Copy HTML to clipboard">
+                    <span class="icon" aria-hidden="true">📋</span> Copy HTML
                 </button>
             </div>
         </div>
@@ -83,8 +95,8 @@
         <div id="richTextToolbar" class="rich-text-toolbar-wrapper" style="display: none;">
             <div class="rich-text-toolbar-content">
                 <div class="toolbar-section">
-                    <label class="toolbar-label">Format</label>
-                    <select id="headingSelect" class="btn-select" title="Select heading level">
+                    <label class="toolbar-label" for="headingSelect">Format</label>
+                    <select id="headingSelect" class="btn-select" title="Select heading level" aria-label="Select text formatting level">
                         <option value="p">Normal</option>
                         <option value="h1">Heading 1</option>
                         <option value="h2">Heading 2</option>
@@ -93,38 +105,38 @@
                         <option value="h5">Heading 5</option>
                         <option value="h6">Heading 6</option>
                     </select>
-                    <button id="boldBtn" class="btn btn-icon" title="Bold"><b>B</b></button>
-                    <button id="italicBtn" class="btn btn-icon" title="Italic"><i>I</i></button>
-                    <button id="underlineBtn" class="btn btn-icon" title="Underline"><u>U</u></button>
-                    <button id="strikeBtn" class="btn btn-icon" title="Strikethrough"><s>S</s></button>
+                    <button id="boldBtn" class="btn btn-icon" title="Bold" aria-label="Make text bold"><b>B</b></button>
+                    <button id="italicBtn" class="btn btn-icon" title="Italic" aria-label="Make text italic"><i>I</i></button>
+                    <button id="underlineBtn" class="btn btn-icon" title="Underline" aria-label="Underline text"><u>U</u></button>
+                    <button id="strikeBtn" class="btn btn-icon" title="Strikethrough" aria-label="Add strikethrough to text"><s>S</s></button>
                 </div>
-                <div class="divider"></div>
+                <div class="divider" role="separator" aria-hidden="true"></div>
                 <div class="toolbar-section">
                     <label class="toolbar-label">Lists</label>
-                    <button id="bulletListBtn" class="btn btn-icon" title="Bullet list">
-                        <span class="icon">•</span> List
+                    <button id="bulletListBtn" class="btn btn-icon" title="Bullet list" aria-label="Insert bullet list">
+                        <span class="icon" aria-hidden="true">•</span> List
                     </button>
-                    <button id="numberListBtn" class="btn btn-icon" title="Numbered list">
-                        <span class="icon">1.</span> List
+                    <button id="numberListBtn" class="btn btn-icon" title="Numbered list" aria-label="Insert numbered list">
+                        <span class="icon" aria-hidden="true">1.</span> List
                     </button>
-                    <button id="checkListBtn" class="btn btn-icon" title="Checklist">
-                        <span class="icon">☑</span> List
+                    <button id="checkListBtn" class="btn btn-icon" title="Checklist" aria-label="Insert checklist">
+                        <span class="icon" aria-hidden="true">☑</span> List
                     </button>
                 </div>
-                <div class="divider"></div>
+                <div class="divider" role="separator" aria-hidden="true"></div>
                 <div class="toolbar-section">
                     <label class="toolbar-label">Insert</label>
-                    <button id="linkBtn" class="btn btn-icon" title="Insert link">
-                        <span class="icon">🔗</span> Link
+                    <button id="linkBtn" class="btn btn-icon" title="Insert link" aria-label="Insert hyperlink">
+                        <span class="icon" aria-hidden="true">🔗</span> Link
                     </button>
-                    <button id="imageBtn" class="btn btn-icon" title="Insert image">
-                        <span class="icon">🖼️</span> Image
+                    <button id="imageBtn" class="btn btn-icon" title="Insert image" aria-label="Insert image">
+                        <span class="icon" aria-hidden="true">🖼️</span> Image
                     </button>
-                    <button id="tableBtn" class="btn btn-icon" title="Insert table">
-                        <span class="icon">📊</span> Table
+                    <button id="tableBtn" class="btn btn-icon" title="Insert table" aria-label="Insert table">
+                        <span class="icon" aria-hidden="true">📊</span> Table
                     </button>
-                    <button id="codeBlockBtn" class="btn btn-icon" title="Code block">
-                        <span class="icon">&lt;/&gt;</span> Code
+                    <button id="codeBlockBtn" class="btn btn-icon" title="Code block" aria-label="Insert code block">
+                        <span class="icon" aria-hidden="true">&lt;/&gt;</span> Code
                     </button>
                 </div>
             </div>
@@ -137,8 +149,8 @@
                 <div class="pane-header">
                     <h2 id="editorModeLabel">Markdown Editor</h2>
                     <div class="pane-header-actions">
-                        <span class="status" id="saveStatus">Auto-save enabled</span>
-                        <button id="editorFullscreenBtn" class="btn-icon-small" title="Toggle editor fullscreen">⛶</button>
+                        <span class="status" id="saveStatus" role="status" aria-live="polite">Auto-save enabled</span>
+                        <button id="editorFullscreenBtn" class="btn-icon-small" title="Toggle editor fullscreen" aria-label="Toggle editor fullscreen mode">⛶</button>
                     </div>
                 </div>
                 <textarea
@@ -146,23 +158,27 @@
                     class="editor-textarea"
                     placeholder="Start typing your markdown here..."
                     spellcheck="false"
+                    aria-label="Markdown editor textarea"
                 ></textarea>
                 <!-- Rich text editor (hidden initially) -->
                 <div id="richTextEditor"
                      class="rich-text-editor"
                      contenteditable="true"
                      style="display: none;"
-                     spellcheck="true"></div>
+                     spellcheck="true"
+                     role="textbox"
+                     aria-label="Rich text editor"
+                     aria-multiline="true"></div>
             </div>
 
             <!-- Resizer -->
-            <div class="resizer"></div>
+            <div class="resizer" role="separator" aria-label="Resize editor and preview panes" aria-orientation="vertical"></div>
 
             <!-- Preview pane -->
             <div class="preview-pane">
                 <div class="pane-header">
                     <h2>Preview</h2>
-                    <button id="previewFullscreenBtn" class="btn-icon-small" title="Toggle preview fullscreen">⛶</button>
+                    <button id="previewFullscreenBtn" class="btn-icon-small" title="Toggle preview fullscreen" aria-label="Toggle preview fullscreen mode">⛶</button>
                 </div>
                 <div id="preview" class="preview-content"></div>
             </div>
@@ -178,6 +194,9 @@
                     <span class="footer-separator">•</span>
                     <a href="https://github.com/Emrullah007/markdown-editor/blob/main/README.md" target="_blank" rel="noopener noreferrer">Documentation</a>
                 </div>
+                <div class="footer-center">
+                    <span id="wordCount" class="stats-display" role="status" aria-live="polite">0 words • 0 characters • 0 min read</span>
+                </div>
                 <div class="footer-right">
                     <span class="keyboard-hint">💾 <kbd>Ctrl</kbd>+<kbd>S</kbd> / <kbd>⌘</kbd>+<kbd>S</kbd> to save</span>
                 </div>
@@ -186,6 +205,8 @@
     </div>
 
     <!-- Scripts -->
+    <script src="image-storage.js"></script>
+    <script src="history-manager.js"></script>
     <script src="markdown-parser.js"></script>
     <script src="rich-text-editor.js"></script>
     <script src="app.js"></script>

@@ -459,11 +459,26 @@ body.dark-mode .btn-icon {
 }
 
 .footer-left,
+.footer-center,
 .footer-right {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     flex-wrap: wrap;
+}
+
+.footer-center {
+    flex: 1;
+    justify-content: center;
+}
+
+.stats-display {
+    font-weight: 500;
+    color: var(--text-primary);
+    background-color: var(--bg-tertiary);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
 }
 
 .footer a {
@@ -652,9 +667,15 @@ body.dark-mode .keyboard-hint:hover {
     }
 
     .footer-left,
+    .footer-center,
     .footer-right {
         justify-content: center;
         font-size: 0.75rem;
+    }
+
+    .stats-display {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.8rem;
     }
 
     .keyboard-hint {

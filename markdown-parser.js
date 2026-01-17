@@ -6,6 +6,18 @@ class MarkdownParser {
         this.initializeMarked();
     }
 
+    // HTML escape utility for security
+    escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
     initializeMarked() {
         // Configure marked options
         marked.setOptions({
@@ -41,9 +53,26 @@ class MarkdownParser {
             }
         };
 
-        // Override inline code rendering
-        renderer.codespan = function(code) {
-            return `<code>${code}</code>`;
+        // Override inline code rendering with proper escaping
+        renderer.codespan = (code) => {
+            return `<code>${this.escapeHtml(code)}</code>`;
+        };
+
+        // Override image rendering to handle IndexedDB images
+        renderer.image = (href, title, text) => {
+            // Check if this is an IndexedDB image reference
+            if (href.startsWith('indexed://')) {
+                const imageId = href.substring('indexed://'.length);
+                const titleAttr = title ? ` title="${this.escapeHtml(title)}"` : '';
+                const altAttr = text ? this.escapeHtml(text) : '';
+                // Return a placeholder that will be replaced with actual image data
+                return `<img src="loading" alt="${altAttr}"${titleAttr} data-image-id="${imageId}" class="indexed-image">`;
+            }
+
+            // Standard image rendering with escaping
+            const titleAttr = title ? ` title="${this.escapeHtml(title)}"` : '';
+            const altAttr = text ? this.escapeHtml(text) : '';
+            return `<img src="${this.escapeHtml(href)}" alt="${altAttr}"${titleAttr} style="max-width: 100%;">`;
         };
 
         // Set the custom renderer

@@ -1,11 +1,31 @@
 // Markdown Editor Application
 // Main application logic
 
+// Constants
+const CONSTANTS = {
+    AUTO_SAVE_DELAY: 2000, // 2 seconds
+    PREVIEW_UPDATE_DELAY: 300, // 300ms
+    STATUS_DISPLAY_DURATION: 2000, // 2 seconds
+    STORAGE_KEY: 'markdown-editor-content',
+    DARK_MODE_KEY: 'markdown-editor-dark-mode',
+    RESIZER_MIN_PERCENT: 20,
+    RESIZER_MAX_PERCENT: 80,
+};
+
+// DOMPurify sanitization configuration
+const DOMPURIFY_CONFIG = {
+    ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'strong', 'em', 'del', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'img', 'br', 'hr', 'span', 'div', 'input'],
+    ALLOWED_ATTR: ['href', 'src', 'alt', 'class', 'type', 'checked', 'disabled', 'title', 'id', 'target', 'rel', 'data-image-id', 'style'],
+    ALLOW_DATA_ATTR: false
+};
+
 class MarkdownEditor {
     constructor() {
+        // Cache all DOM elements to reduce queries
         this.editor = document.getElementById('editor');
         this.preview = document.getElementById('preview');
         this.saveStatus = document.getElementById('saveStatus');
+        this.wordCount = document.getElementById('wordCount');
 
         // Rich text editor elements
         this.richTextEditorElement = document.getElementById('richTextEditor');
@@ -13,19 +33,53 @@ class MarkdownEditor {
         this.currentMode = 'markdown'; // 'markdown' or 'richtext'
         this.richTextToolbar = document.getElementById('richTextToolbar');
 
-        // Storage keys
-        this.STORAGE_KEY = 'markdown-editor-content';
-        this.DARK_MODE_KEY = 'markdown-editor-dark-mode';
+        // Toolbar buttons
+        this.modeToggle = document.getElementById('modeToggle');
+        this.editorModeLabel = document.getElementById('editorModeLabel');
+        this.darkModeToggle = document.getElementById('darkModeToggle');
+        this.clearBtn = document.getElementById('clearBtn');
+        this.undoBtn = document.getElementById('undoBtn');
+        this.redoBtn = document.getElementById('redoBtn');
+        this.importMdBtn = document.getElementById('importMdBtn');
+        this.downloadMdBtn = document.getElementById('downloadMdBtn');
+        this.downloadHtmlBtn = document.getElementById('downloadHtmlBtn');
+        this.copyMdBtn = document.getElementById('copyMdBtn');
+        this.copyHtmlBtn = document.getElementById('copyHtmlBtn');
+        this.editorFullscreenBtn = document.getElementById('editorFullscreenBtn');
+        this.previewFullscreenBtn = document.getElementById('previewFullscreenBtn');
 
-        // Auto-save timer
+        // Rich text toolbar buttons
+        this.boldBtn = document.getElementById('boldBtn');
+        this.italicBtn = document.getElementById('italicBtn');
+        this.underlineBtn = document.getElementById('underlineBtn');
+        this.strikeBtn = document.getElementById('strikeBtn');
+        this.headingSelect = document.getElementById('headingSelect');
+        this.bulletListBtn = document.getElementById('bulletListBtn');
+        this.numberListBtn = document.getElementById('numberListBtn');
+        this.checkListBtn = document.getElementById('checkListBtn');
+        this.linkBtn = document.getElementById('linkBtn');
+        this.imageBtn = document.getElementById('imageBtn');
+        this.tableBtn = document.getElementById('tableBtn');
+        this.codeBlockBtn = document.getElementById('codeBlockBtn');
+
+        // Container elements
+        this.container = document.querySelector('.container');
+
+        // Timers
         this.autoSaveTimer = null;
-        this.autoSaveDelay = 2000; // 2 seconds
+        this.previewUpdateTimer = null;
+
+        // History tracking flag
+        this.isApplyingHistoryState = false;
 
         // Initialize
         this.init();
     }
 
-    init() {
+    async init() {
+        // Initialize IndexedDB for image storage
+        await imageStorage.init();
+
         this.setupEventListeners();
         this.loadContent();
         this.loadDarkModePreference();
@@ -40,68 +94,150 @@ class MarkdownEditor {
     }
 
     setupEventListeners() {
-        // Editor input - live preview
+        // Editor input - live preview with debouncing
         this.editor.addEventListener('input', () => {
-            this.updatePreview();
+            this.schedulePreviewUpdate();
             this.scheduleAutoSave();
+            this.updateWordCount();
+
+            // Track history (debounced internally by history manager)
+            if (!this.isApplyingHistoryState) {
+                historyManager.pushState(this.editor.value);
+                this.updateUndoRedoButtons();
+            }
         });
 
         // Mode toggle
-        document.getElementById('modeToggle').addEventListener('click', () => {
+        this.modeToggle.addEventListener('click', () => {
             this.toggleMode();
         });
 
         // Rich text editor input
         this.richTextEditorElement.addEventListener('input', () => {
             this.handleRichTextInput();
+            this.updateWordCount();
+
+            // Track history in rich text mode
+            if (!this.isApplyingHistoryState) {
+                const markdown = this.richTextEditor.getMarkdown();
+                historyManager.pushState(markdown);
+                this.updateUndoRedoButtons();
+            }
         });
 
         // Dark mode toggle
-        document.getElementById('darkModeToggle').addEventListener('click', () => {
+        this.darkModeToggle.addEventListener('click', () => {
             this.toggleDarkMode();
         });
 
         // Clear button
-        document.getElementById('clearBtn').addEventListener('click', () => {
+        this.clearBtn.addEventListener('click', () => {
             this.clearEditor();
+        });
+
+        // Undo/Redo buttons
+        this.undoBtn.addEventListener('click', () => {
+            this.undo();
+        });
+
+        this.redoBtn.addEventListener('click', () => {
+            this.redo();
         });
 
         // Rich text toolbar buttons
         this.setupRichTextToolbar();
 
+        // Import button
+        this.importMdBtn.addEventListener('click', () => {
+            this.importMarkdown();
+        });
+
         // Download buttons
-        document.getElementById('downloadMdBtn').addEventListener('click', () => {
+        this.downloadMdBtn.addEventListener('click', () => {
             this.downloadMarkdown();
         });
 
-        document.getElementById('downloadHtmlBtn').addEventListener('click', () => {
+        this.downloadHtmlBtn.addEventListener('click', () => {
             this.downloadHtml();
         });
 
         // Copy buttons
-        document.getElementById('copyMdBtn').addEventListener('click', () => {
+        this.copyMdBtn.addEventListener('click', () => {
             this.copyMarkdown();
         });
 
-        document.getElementById('copyHtmlBtn').addEventListener('click', () => {
+        this.copyHtmlBtn.addEventListener('click', () => {
             this.copyHtml();
         });
 
         // Fullscreen buttons
-        document.getElementById('editorFullscreenBtn').addEventListener('click', () => {
+        this.editorFullscreenBtn.addEventListener('click', () => {
             this.toggleEditorFullscreen();
         });
 
-        document.getElementById('previewFullscreenBtn').addEventListener('click', () => {
+        this.previewFullscreenBtn.addEventListener('click', () => {
             this.togglePreviewFullscreen();
         });
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
+            // Ctrl+Z or Cmd+Z for undo
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+                e.preventDefault();
+                this.undo();
+                return;
+            }
+
+            // Ctrl+Shift+Z or Cmd+Shift+Z for redo (also Ctrl+Y)
+            if ((e.ctrlKey || e.metaKey) && (e.shiftKey && e.key === 'Z' || e.key === 'y')) {
+                e.preventDefault();
+                this.redo();
+                return;
+            }
+
             // Ctrl+S or Cmd+S to download markdown
             if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                 e.preventDefault();
                 this.downloadMarkdown();
+                return;
+            }
+
+            // Rich text formatting shortcuts (only when in rich text mode)
+            if (this.currentMode === 'richtext') {
+                // Ctrl+B or Cmd+B for bold
+                if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+                    e.preventDefault();
+                    this.richTextEditor.formatText('bold');
+                    return;
+                }
+
+                // Ctrl+I or Cmd+I for italic
+                if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
+                    e.preventDefault();
+                    this.richTextEditor.formatText('italic');
+                    return;
+                }
+
+                // Ctrl+U or Cmd+U for underline
+                if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
+                    e.preventDefault();
+                    this.richTextEditor.formatText('underline');
+                    return;
+                }
+
+                // Ctrl+K or Cmd+K for link
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    this.richTextEditor.insertLink();
+                    return;
+                }
+
+                // Ctrl+Shift+X or Cmd+Shift+X for strikethrough
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'X') {
+                    e.preventDefault();
+                    this.richTextEditor.formatText('strikeThrough');
+                    return;
+                }
             }
         });
 
@@ -109,26 +245,60 @@ class MarkdownEditor {
         this.setupResizer();
     }
 
-    updatePreview() {
+    schedulePreviewUpdate() {
+        // Clear existing timer
+        if (this.previewUpdateTimer) {
+            clearTimeout(this.previewUpdateTimer);
+        }
+
+        // Set new timer for debounced update
+        this.previewUpdateTimer = setTimeout(() => {
+            this.updatePreview();
+        }, CONSTANTS.PREVIEW_UPDATE_DELAY);
+    }
+
+    async updatePreview() {
         const markdown = this.editor.value;
         const html = markdownParser.parse(markdown);
         // Sanitize HTML to prevent XSS attacks
-        const cleanHtml = DOMPurify.sanitize(html, {
-            ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'strong', 'em', 'del', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'img', 'br', 'hr', 'span', 'div', 'input'],
-            ALLOWED_ATTR: ['href', 'src', 'alt', 'class', 'type', 'checked', 'disabled', 'title', 'id', 'target', 'rel'],
-            ALLOW_DATA_ATTR: false
-        });
+        const cleanHtml = DOMPurify.sanitize(html, DOMPURIFY_CONFIG);
         this.preview.innerHTML = cleanHtml;
+
+        // Load images from IndexedDB
+        await this.loadIndexedImages();
     }
 
-    toggleMode() {
+    async loadIndexedImages() {
+        // Find all images with IndexedDB references
+        const indexedImages = this.preview.querySelectorAll('img[data-image-id]');
+
+        for (const img of indexedImages) {
+            const imageId = img.getAttribute('data-image-id');
+            try {
+                const imageRecord = await imageStorage.getImage(imageId);
+                if (imageRecord && imageRecord.data) {
+                    img.src = imageRecord.data;
+                    img.style.maxWidth = '100%';
+                } else {
+                    // Image not found in IndexedDB
+                    img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><text x="10" y="50" font-size="12">Image not found</text></svg>';
+                    img.title = 'Image not found in storage';
+                }
+            } catch (error) {
+                console.error('Error loading image from IndexedDB:', error);
+                img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><text x="10" y="50" font-size="12">Error loading image</text></svg>';
+            }
+        }
+    }
+
+    async toggleMode() {
         if (this.currentMode === 'markdown') {
             // Switch to rich text mode
             this.currentMode = 'richtext';
 
             // Convert markdown to HTML and set in rich text editor
             const markdown = this.editor.value;
-            this.richTextEditor.setContent(markdown);
+            await this.richTextEditor.setContent(markdown);
 
             // Toggle visibility
             this.editor.style.display = 'none';
@@ -136,8 +306,8 @@ class MarkdownEditor {
             this.richTextToolbar.style.display = 'block';
 
             // Update UI
-            document.getElementById('modeToggle').innerHTML = '📝 Switch to Markdown';
-            document.getElementById('editorModeLabel').textContent = 'Rich Text Editor';
+            this.modeToggle.innerHTML = '📝 Switch to Markdown';
+            this.editorModeLabel.textContent = 'Rich Text Editor';
 
         } else {
             // Switch to markdown mode
@@ -153,25 +323,31 @@ class MarkdownEditor {
             this.richTextToolbar.style.display = 'none';
 
             // Update UI
-            document.getElementById('modeToggle').innerHTML = '📝 Switch to Rich Text';
-            document.getElementById('editorModeLabel').textContent = 'Markdown Editor';
+            this.modeToggle.innerHTML = '📝 Switch to Rich Text';
+            this.editorModeLabel.textContent = 'Markdown Editor';
 
             // Update preview
-            this.updatePreview();
+            await this.updatePreview();
         }
     }
 
     handleRichTextInput() {
-        // Convert to markdown and update preview
-        const markdown = this.richTextEditor.getMarkdown();
-        const html = markdownParser.parse(markdown);
-        // Sanitize HTML to prevent XSS attacks
-        const cleanHtml = DOMPurify.sanitize(html, {
-            ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'strong', 'em', 'del', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'img', 'br', 'hr', 'span', 'div', 'input'],
-            ALLOWED_ATTR: ['href', 'src', 'alt', 'class', 'type', 'checked', 'disabled', 'title', 'id', 'target', 'rel'],
-            ALLOW_DATA_ATTR: false
-        });
-        this.preview.innerHTML = cleanHtml;
+        // Debounce preview update for rich text as well
+        if (this.previewUpdateTimer) {
+            clearTimeout(this.previewUpdateTimer);
+        }
+
+        this.previewUpdateTimer = setTimeout(async () => {
+            // Convert to markdown and update preview
+            const markdown = this.richTextEditor.getMarkdown();
+            const html = markdownParser.parse(markdown);
+            // Sanitize HTML to prevent XSS attacks
+            const cleanHtml = DOMPurify.sanitize(html, DOMPURIFY_CONFIG);
+            this.preview.innerHTML = cleanHtml;
+
+            // Load images from IndexedDB
+            await this.loadIndexedImages();
+        }, CONSTANTS.PREVIEW_UPDATE_DELAY);
 
         // Schedule auto-save
         this.scheduleAutoSave();
@@ -179,37 +355,37 @@ class MarkdownEditor {
 
     setupRichTextToolbar() {
         // Bold, italic, underline, strikethrough
-        document.getElementById('boldBtn').addEventListener('click', () =>
+        this.boldBtn.addEventListener('click', () =>
             this.richTextEditor.formatText('bold'));
-        document.getElementById('italicBtn').addEventListener('click', () =>
+        this.italicBtn.addEventListener('click', () =>
             this.richTextEditor.formatText('italic'));
-        document.getElementById('underlineBtn').addEventListener('click', () =>
+        this.underlineBtn.addEventListener('click', () =>
             this.richTextEditor.formatText('underline'));
-        document.getElementById('strikeBtn').addEventListener('click', () =>
+        this.strikeBtn.addEventListener('click', () =>
             this.richTextEditor.formatText('strikeThrough'));
 
         // Headings
-        document.getElementById('headingSelect').addEventListener('change', (e) => {
+        this.headingSelect.addEventListener('change', (e) => {
             this.richTextEditor.applyHeading(e.target.value);
             e.target.value = 'p'; // Reset to normal
         });
 
         // Lists
-        document.getElementById('bulletListBtn').addEventListener('click', () =>
+        this.bulletListBtn.addEventListener('click', () =>
             this.richTextEditor.insertList('ul'));
-        document.getElementById('numberListBtn').addEventListener('click', () =>
+        this.numberListBtn.addEventListener('click', () =>
             this.richTextEditor.insertList('ol'));
-        document.getElementById('checkListBtn').addEventListener('click', () =>
+        this.checkListBtn.addEventListener('click', () =>
             this.richTextEditor.insertList('checklist'));
 
         // Insert elements
-        document.getElementById('linkBtn').addEventListener('click', () =>
+        this.linkBtn.addEventListener('click', () =>
             this.richTextEditor.insertLink());
-        document.getElementById('imageBtn').addEventListener('click', () =>
+        this.imageBtn.addEventListener('click', () =>
             this.richTextEditor.insertImage());
-        document.getElementById('tableBtn').addEventListener('click', () =>
+        this.tableBtn.addEventListener('click', () =>
             this.richTextEditor.insertTable());
-        document.getElementById('codeBlockBtn').addEventListener('click', () =>
+        this.codeBlockBtn.addEventListener('click', () =>
             this.richTextEditor.insertCodeBlock());
     }
 
@@ -222,7 +398,7 @@ class MarkdownEditor {
         // Set new timer
         this.autoSaveTimer = setTimeout(() => {
             this.saveContent();
-        }, this.autoSaveDelay);
+        }, CONSTANTS.AUTO_SAVE_DELAY);
 
         this.updateSaveStatus('Typing...');
     }
@@ -237,13 +413,13 @@ class MarkdownEditor {
         }
 
         try {
-            localStorage.setItem(this.STORAGE_KEY, content);
+            localStorage.setItem(CONSTANTS.STORAGE_KEY, content);
             this.updateSaveStatus('Saved');
 
-            // Reset status after 2 seconds
+            // Reset status after configured duration
             setTimeout(() => {
                 this.updateSaveStatus('Auto-save enabled');
-            }, 2000);
+            }, CONSTANTS.STATUS_DISPLAY_DURATION);
         } catch (error) {
             console.error('Error saving to localStorage:', error);
             this.updateSaveStatus('Save failed');
@@ -252,7 +428,7 @@ class MarkdownEditor {
 
     loadContent() {
         try {
-            const saved = localStorage.getItem(this.STORAGE_KEY);
+            const saved = localStorage.getItem(CONSTANTS.STORAGE_KEY);
 
             if (saved) {
                 this.editor.value = saved;
@@ -260,9 +436,17 @@ class MarkdownEditor {
                 // Load default sample content
                 this.editor.value = this.getDefaultContent();
             }
+
+            // Initialize history with the loaded content
+            historyManager.pushState(this.editor.value, true);
+            this.updateUndoRedoButtons();
+            this.updateWordCount();
         } catch (error) {
             console.error('Error loading from localStorage:', error);
             this.editor.value = this.getDefaultContent();
+            historyManager.pushState(this.editor.value, true);
+            this.updateUndoRedoButtons();
+            this.updateWordCount();
         }
     }
 
@@ -352,26 +536,25 @@ console.log(greet('World'));
         const isDark = document.body.classList.contains('dark-mode');
 
         // Update button emoji
-        const btn = document.getElementById('darkModeToggle');
-        btn.textContent = isDark ? '☀️' : '🌙';
+        this.darkModeToggle.textContent = isDark ? '☀️' : '🌙';
 
         // Save preference
-        localStorage.setItem(this.DARK_MODE_KEY, isDark);
+        localStorage.setItem(CONSTANTS.DARK_MODE_KEY, isDark);
     }
 
     loadDarkModePreference() {
-        const isDark = localStorage.getItem(this.DARK_MODE_KEY) === 'true';
+        const isDark = localStorage.getItem(CONSTANTS.DARK_MODE_KEY) === 'true';
 
         // Check system preference if no saved preference
-        if (localStorage.getItem(this.DARK_MODE_KEY) === null) {
+        if (localStorage.getItem(CONSTANTS.DARK_MODE_KEY) === null) {
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             if (prefersDark) {
                 document.body.classList.add('dark-mode');
-                document.getElementById('darkModeToggle').textContent = '☀️';
+                this.darkModeToggle.textContent = '☀️';
             }
         } else if (isDark) {
             document.body.classList.add('dark-mode');
-            document.getElementById('darkModeToggle').textContent = '☀️';
+            this.darkModeToggle.textContent = '☀️';
         }
     }
 
@@ -384,7 +567,173 @@ console.log(greet('World'));
             }
             this.updatePreview();
             this.saveContent();
+
+            // Clear history and start fresh
+            historyManager.clear();
+            historyManager.pushState('', true);
+            this.updateUndoRedoButtons();
         }
+    }
+
+    undo() {
+        const previousState = historyManager.undo();
+        if (previousState !== null) {
+            this.isApplyingHistoryState = true;
+
+            if (this.currentMode === 'markdown') {
+                this.editor.value = previousState;
+                this.updatePreview();
+            } else {
+                // In rich text mode, we need to update the rich text editor
+                this.richTextEditorElement.innerHTML = markdownParser.parse(previousState);
+            }
+
+            this.updateUndoRedoButtons();
+            this.isApplyingHistoryState = false;
+        }
+    }
+
+    redo() {
+        const nextState = historyManager.redo();
+        if (nextState !== null) {
+            this.isApplyingHistoryState = true;
+
+            if (this.currentMode === 'markdown') {
+                this.editor.value = nextState;
+                this.updatePreview();
+            } else {
+                // In rich text mode, we need to update the rich text editor
+                this.richTextEditorElement.innerHTML = markdownParser.parse(nextState);
+            }
+
+            this.updateUndoRedoButtons();
+            this.isApplyingHistoryState = false;
+        }
+    }
+
+    updateUndoRedoButtons() {
+        // Update button states based on history availability
+        this.undoBtn.disabled = !historyManager.canUndo();
+        this.redoBtn.disabled = !historyManager.canRedo();
+    }
+
+    updateWordCount() {
+        // Get current content
+        let content;
+        if (this.currentMode === 'markdown') {
+            content = this.editor.value;
+        } else {
+            content = this.richTextEditor.getMarkdown();
+        }
+
+        // Calculate stats
+        const stats = this.calculateTextStats(content);
+
+        // Update display
+        this.wordCount.textContent = `${stats.words} words • ${stats.characters} characters • ${stats.readTime} min read`;
+    }
+
+    calculateTextStats(text) {
+        // Remove markdown syntax for more accurate word count
+        const cleanText = text
+            // Remove code blocks
+            .replace(/```[\s\S]*?```/g, '')
+            // Remove inline code
+            .replace(/`[^`]+`/g, '')
+            // Remove links but keep text
+            .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+            // Remove images
+            .replace(/!\[([^\]]*)\]\([^)]+\)/g, '')
+            // Remove headers
+            .replace(/^#{1,6}\s+/gm, '')
+            // Remove bold/italic
+            .replace(/[*_]{1,3}/g, '')
+            // Remove strikethrough
+            .replace(/~~(.+?)~~/g, '$1')
+            // Remove blockquotes
+            .replace(/^>\s+/gm, '')
+            // Remove list markers
+            .replace(/^[-*+]\s+/gm, '')
+            .replace(/^\d+\.\s+/gm, '')
+            // Remove horizontal rules
+            .replace(/^[-*_]{3,}$/gm, '')
+            .trim();
+
+        // Count words (split by whitespace)
+        const words = cleanText.length > 0
+            ? cleanText.split(/\s+/).filter(word => word.length > 0).length
+            : 0;
+
+        // Count characters (excluding whitespace)
+        const characters = cleanText.replace(/\s/g, '').length;
+
+        // Calculate read time (average 200 words per minute)
+        const readTime = Math.ceil(words / 200) || 0;
+
+        return {
+            words,
+            characters,
+            readTime
+        };
+    }
+
+    importMarkdown() {
+        // Create a file input element
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.md,.markdown,.txt';
+
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            try {
+                const text = await file.text();
+
+                // Confirm if editor has content
+                const currentContent = this.currentMode === 'markdown'
+                    ? this.editor.value
+                    : this.richTextEditor.getMarkdown();
+
+                if (currentContent.trim() && !confirm('This will replace your current content. Continue?')) {
+                    return;
+                }
+
+                // Import the content
+                if (this.currentMode === 'markdown') {
+                    this.editor.value = text;
+                } else {
+                    // Switch to markdown mode for import
+                    this.currentMode = 'markdown';
+                    this.editor.value = text;
+                    this.editor.style.display = 'block';
+                    this.richTextEditorElement.style.display = 'none';
+                    this.richTextToolbar.style.display = 'none';
+                    this.modeToggle.innerHTML = '📝 Switch to Rich Text';
+                    this.editorModeLabel.textContent = 'Markdown Editor';
+                }
+
+                // Update preview and save
+                await this.updatePreview();
+                this.saveContent();
+
+                // Add to history
+                historyManager.pushState(text, true);
+                this.updateUndoRedoButtons();
+
+                this.updateSaveStatus('File imported');
+                setTimeout(() => {
+                    this.updateSaveStatus('Auto-save enabled');
+                }, CONSTANTS.STATUS_DISPLAY_DURATION);
+
+            } catch (error) {
+                console.error('Error importing file:', error);
+                alert('Failed to import file. Please try again.');
+            }
+        };
+
+        // Trigger file picker
+        input.click();
     }
 
     downloadMarkdown() {
@@ -459,7 +808,7 @@ console.log(greet('World'));
         this.updateSaveStatus(message);
         setTimeout(() => {
             this.updateSaveStatus(originalStatus);
-        }, 2000);
+        }, CONSTANTS.STATUS_DISPLAY_DURATION);
     }
 
     showCopyError() {
@@ -486,8 +835,8 @@ console.log(greet('World'));
             const offsetX = e.clientX - containerRect.left;
             const percentage = (offsetX / containerRect.width) * 100;
 
-            // Limit between 20% and 80%
-            if (percentage > 20 && percentage < 80) {
+            // Limit between configured min and max percentages
+            if (percentage > CONSTANTS.RESIZER_MIN_PERCENT && percentage < CONSTANTS.RESIZER_MAX_PERCENT) {
                 editorPane.style.flex = `0 0 ${percentage}%`;
                 previewPane.style.flex = `0 0 ${100 - percentage}%`;
             }
@@ -502,32 +851,26 @@ console.log(greet('World'));
     }
 
     toggleEditorFullscreen() {
-        const container = document.querySelector('.container');
-        const btn = document.getElementById('editorFullscreenBtn');
+        this.container.classList.toggle('editor-fullscreen');
 
-        container.classList.toggle('editor-fullscreen');
-
-        if (container.classList.contains('editor-fullscreen')) {
-            btn.textContent = '✕'; // Exit fullscreen icon
-            btn.title = 'Exit fullscreen';
+        if (this.container.classList.contains('editor-fullscreen')) {
+            this.editorFullscreenBtn.textContent = '✕'; // Exit fullscreen icon
+            this.editorFullscreenBtn.title = 'Exit fullscreen';
         } else {
-            btn.textContent = '⛶'; // Fullscreen icon
-            btn.title = 'Toggle editor fullscreen';
+            this.editorFullscreenBtn.textContent = '⛶'; // Fullscreen icon
+            this.editorFullscreenBtn.title = 'Toggle editor fullscreen';
         }
     }
 
     togglePreviewFullscreen() {
-        const container = document.querySelector('.container');
-        const btn = document.getElementById('previewFullscreenBtn');
+        this.container.classList.toggle('preview-fullscreen');
 
-        container.classList.toggle('preview-fullscreen');
-
-        if (container.classList.contains('preview-fullscreen')) {
-            btn.textContent = '✕'; // Exit fullscreen icon
-            btn.title = 'Exit fullscreen';
+        if (this.container.classList.contains('preview-fullscreen')) {
+            this.previewFullscreenBtn.textContent = '✕'; // Exit fullscreen icon
+            this.previewFullscreenBtn.title = 'Exit fullscreen';
         } else {
-            btn.textContent = '⛶'; // Fullscreen icon
-            btn.title = 'Toggle preview fullscreen';
+            this.previewFullscreenBtn.textContent = '⛶'; // Fullscreen icon
+            this.previewFullscreenBtn.title = 'Toggle preview fullscreen';
         }
     }
 }

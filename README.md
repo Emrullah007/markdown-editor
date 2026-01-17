@@ -12,11 +12,14 @@ A modern, feature-rich markdown and rich text editor with live preview, syntax h
 - **Dual Editor Modes** - Toggle between Markdown and Rich Text (WYSIWYG) editing
 - **Live Preview** - Real-time markdown rendering as you type
 - **Auto-save** - Automatic saving to browser's local storage every 2 seconds
+- **Undo/Redo** - Full history management with Ctrl+Z and Ctrl+Shift+Z shortcuts
 - **Dark Mode** - Eye-friendly dark theme with system preference detection
 - **Responsive Design** - Optimized for desktop, tablet, and mobile devices
 - **Fullscreen Mode** - Expand editor or preview to fullscreen for focused work
+- **Word Count** - Live statistics showing word count, character count, and reading time
 
-### Export Options
+### Import/Export Options
+- Import Markdown files (.md, .markdown, .txt) from disk
 - Download as Markdown (.md)
 - Download as HTML (.html)
 - Copy markdown to clipboard
@@ -68,6 +71,13 @@ No build process or dependencies installation required! Just open and use.
 ### Keyboard Shortcuts
 
 - `Ctrl+S` (or `Cmd+S` on Mac) - Download markdown file
+- `Ctrl+Z` (or `Cmd+Z` on Mac) - Undo
+- `Ctrl+Shift+Z` or `Ctrl+Y` (or `Cmd+Shift+Z` / `Cmd+Y` on Mac) - Redo
+- `Ctrl+B` (or `Cmd+B` on Mac) - Bold (in Rich Text mode)
+- `Ctrl+I` (or `Cmd+I` on Mac) - Italic (in Rich Text mode)
+- `Ctrl+U` (or `Cmd+U` on Mac) - Underline (in Rich Text mode)
+- `Ctrl+K` (or `Cmd+K` on Mac) - Insert link (in Rich Text mode)
+- `Ctrl+Shift+X` (or `Cmd+Shift+X` on Mac) - Strikethrough (in Rich Text mode)
 
 ## Supported Markdown Features
 
@@ -106,6 +116,8 @@ markdown-editor/
 ├── app.js                  # Core application logic
 ├── markdown-parser.js      # Markdown parsing wrapper
 ├── rich-text-editor.js     # Rich text editor functionality
+├── image-storage.js        # IndexedDB image storage
+├── history-manager.js      # Undo/redo history management
 ├── package.json            # Project metadata
 ├── LICENSE                 # MIT License
 ├── CONTRIBUTING.md         # Contribution guidelines
@@ -118,14 +130,29 @@ markdown-editor/
 ### Auto-save
 Your content is automatically saved to the browser's localStorage every 2 seconds after you stop typing. When you return to the editor, your previous work is automatically restored.
 
+### Undo/Redo
+Full history management with support for up to 100 states. Use Ctrl+Z to undo and Ctrl+Shift+Z or Ctrl+Y to redo. History is debounced to avoid saving every keystroke, creating a smooth editing experience.
+
 ### Dark Mode
 Toggle between light and dark themes. Your preference is saved and will be remembered on your next visit. The editor also detects your system's color scheme preference on first load.
+
+### Import
+Open markdown files directly from your disk. Supports .md, .markdown, and .txt files. The editor will prompt you before replacing existing content.
 
 ### Export
 - **Download .md** - Save your markdown as a file
 - **Download .html** - Export as a standalone HTML document with embedded styles
 - **Copy MD** - Copy raw markdown to clipboard
 - **Copy HTML** - Copy rendered HTML to clipboard
+
+### Word Count
+Live statistics display in the footer showing:
+- **Word count** - Total number of words in your document
+- **Character count** - Total characters (excluding whitespace)
+- **Reading time** - Estimated reading time based on 200 words per minute
+
+### Image Storage
+Images are stored efficiently in IndexedDB instead of localStorage, supporting files up to 10MB. Images are automatically loaded when you reopen your documents.
 
 ### Resizable Panes
 Drag the divider between the editor and preview panes to adjust their sizes according to your preference.
@@ -134,14 +161,14 @@ Drag the divider between the editor and preview panes to adjust their sizes acco
 
 Potential features for future versions:
 - PDF export
-- Import markdown files
 - Multiple file/tab support
-- Custom themes
+- Custom themes and theme builder
 - Vim/Emacs keybindings
-- Markdown templates
-- Word count and reading time
-- Collaborative editing
-- Cloud sync
+- Markdown templates library
+- Collaborative editing (requires backend)
+- Cloud sync (requires backend)
+- Spell checker
+- Find and replace functionality
 
 ## Contributing
 

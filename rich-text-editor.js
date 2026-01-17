@@ -1,6 +1,9 @@
 // Rich Text Editor
 // Handles WYSIWYG editing with HTML to Markdown conversion
 
+// Constants
+const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
+
 class RichTextEditor {
     constructor(editorElement, markdownEditor) {
         this.editor = editorElement;
@@ -13,6 +16,50 @@ class RichTextEditor {
         this.setupTurndown();
         this.setupPasteHandler();
         this.setupDragDropHandler();
+    }
+
+    // Security: Validate and sanitize URLs
+    isValidUrl(url) {
+        if (!url || typeof url !== 'string') return false;
+
+        // Trim whitespace
+        url = url.trim();
+
+        // Block dangerous protocols
+        const dangerousProtocols = ['javascript:', 'data:', 'vbscript:', 'file:', 'about:'];
+        const lowerUrl = url.toLowerCase();
+
+        for (let protocol of dangerousProtocols) {
+            if (lowerUrl.startsWith(protocol)) {
+                return false;
+            }
+        }
+
+        // Allow http, https, mailto, relative URLs
+        if (url.startsWith('http://') || url.startsWith('https://') ||
+            url.startsWith('mailto:') || url.startsWith('/') ||
+            url.startsWith('#') || url.startsWith('./') || url.startsWith('../')) {
+            return true;
+        }
+
+        // Allow URLs without protocol (assume https)
+        if (/^[a-z0-9]([a-z0-9-]*[a-z0-9])?\.[a-z]{2,}/i.test(url)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // HTML escape utility for security
+    escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
     }
 
     setupTurndown() {
@@ -30,6 +77,18 @@ class RichTextEditor {
             const gfm = window.turndownPluginGfm.gfm;
             this.turndownService.use(gfm);
         }
+
+        // Custom rule for images with IndexedDB IDs
+        this.turndownService.addRule('indexedImages', {
+            filter: function (node) {
+                return node.nodeName === 'IMG' && node.hasAttribute('data-image-id');
+            },
+            replacement: function (content, node) {
+                const alt = node.getAttribute('alt') || '';
+                const imageId = node.getAttribute('data-image-id');
+                return `![${alt}](indexed://${imageId})`;
+            }
+        });
 
         // Keep existing rules and add custom handling
         this.turndownService.keep(['u']); // Keep underline as HTML since markdown doesn't support it
@@ -96,9 +155,19 @@ class RichTextEditor {
     insertLink() {
         const url = prompt('Enter URL:');
         if (url) {
+            // Validate URL for security
+            if (!this.isValidUrl(url)) {
+                alert('Invalid or unsafe URL. Please use http://, https://, or a valid domain name.\nJavaScript and data URLs are not allowed for security reasons.');
+                this.editor.focus();
+                return;
+            }
+
             const text = prompt('Enter link text:', url);
             if (text !== null) {
-                const link = `<a href="${url}">${text || url}</a>`;
+                // Escape HTML in both URL and text to prevent XSS
+                const safeUrl = this.escapeHtml(url.trim());
+                const safeText = this.escapeHtml(text || url);
+                const link = `<a href="${safeUrl}">${safeText}</a>`;
                 document.execCommand('insertHTML', false, link);
             }
         }
@@ -185,9 +254,29 @@ class RichTextEditor {
         return this.turndownService.turndown(this.editor.innerHTML);
     }
 
-    setContent(markdown) {
+    async setContent(markdown) {
         const html = markdownParser.parse(markdown);
         this.editor.innerHTML = html;
+
+        // Load images from IndexedDB
+        await this.loadIndexedImages();
+    }
+
+    async loadIndexedImages() {
+        // Find all images with IndexedDB references
+        const indexedImages = this.editor.querySelectorAll('img[data-image-id]');
+
+        for (const img of indexedImages) {
+            const imageId = img.getAttribute('data-image-id');
+            try {
+                const imageRecord = await imageStorage.getImage(imageId);
+                if (imageRecord && imageRecord.data) {
+                    img.src = imageRecord.data;
+                }
+            } catch (error) {
+                console.error('Error loading image from IndexedDB:', error);
+            }
+        }
     }
 
     // ===== Image Handling =====
@@ -227,11 +316,36 @@ class RichTextEditor {
 
     async insertImageFromFile(file) {
         try {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select a valid image file.');
+                return;
+            }
+
+            // Validate file size - now with more generous limit since using IndexedDB
+            // IndexedDB can handle much larger files than localStorage
+            const MAX_INDEXEDDB_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
+            if (file.size > MAX_INDEXEDDB_IMAGE_SIZE) {
+                alert('Image is too large. Please use an image smaller than 10MB.\n\nTip: Consider uploading to an image hosting service and using a URL instead.');
+                return;
+            }
+
             const base64 = await this.imageToBase64(file);
+
+            // Store image in IndexedDB and get its ID
+            const imageId = await imageStorage.storeImage(base64, {
+                alt: file.name || 'Image',
+                fileName: file.name,
+                fileType: file.type,
+                fileSize: file.size
+            });
+
+            // Create image element with IndexedDB reference
             const img = document.createElement('img');
-            img.src = base64;
-            img.alt = file.name || 'Pasted image';
+            img.src = base64; // Use base64 for immediate display
+            img.alt = file.name || 'Image';
             img.style.maxWidth = '100%';
+            img.dataset.imageId = imageId; // Store the IndexedDB ID
 
             // Insert at cursor
             const selection = window.getSelection();
