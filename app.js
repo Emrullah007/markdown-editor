@@ -1,25 +1,53 @@
-// Markdown Editor Application
-// Main application logic
+/**
+ * Markdown Editor Application
+ * Main application logic for the markdown editor with live preview,
+ * rich text editing, theme support, and export capabilities.
+ * @module MarkdownEditorApp
+ * @author Emrullah Celik
+ * @version 1.1.0
+ */
 
-// Constants
+/**
+ * Application constants
+ * @constant {Object}
+ */
 const CONSTANTS = {
     AUTO_SAVE_DELAY: 2000, // 2 seconds
     PREVIEW_UPDATE_DELAY: 300, // 300ms
     STATUS_DISPLAY_DURATION: 2000, // 2 seconds
     STORAGE_KEY: 'markdown-editor-content',
-    DARK_MODE_KEY: 'markdown-editor-dark-mode',
+    THEME_KEY: 'markdown-editor-theme',
     RESIZER_MIN_PERCENT: 20,
     RESIZER_MAX_PERCENT: 80,
 };
 
-// DOMPurify sanitization configuration
+// Available themes
+const THEMES = ['light', 'dark', 'ocean', 'forest', 'sunset', 'lavender', 'rose', 'mint'];
+
+/**
+ * DOMPurify sanitization configuration for XSS protection
+ * @constant {Object}
+ * @property {string[]} ALLOWED_TAGS - HTML tags allowed in sanitized output
+ * @property {string[]} ALLOWED_ATTR - HTML attributes allowed in sanitized output
+ * @property {boolean} ALLOW_DATA_ATTR - Whether to allow data-* attributes
+ */
 const DOMPURIFY_CONFIG = {
     ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'strong', 'em', 'del', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'img', 'br', 'hr', 'span', 'div', 'input'],
     ALLOWED_ATTR: ['href', 'src', 'alt', 'class', 'type', 'checked', 'disabled', 'title', 'id', 'target', 'rel', 'data-image-id', 'style'],
     ALLOW_DATA_ATTR: false
 };
 
+/**
+ * Main Markdown Editor class
+ * Handles all editor functionality including markdown/rich text editing,
+ * preview rendering, file operations, and theme management.
+ * @class
+ */
 class MarkdownEditor {
+    /**
+     * Create a MarkdownEditor instance
+     * Initializes all DOM element references and sets up the editor
+     */
     constructor() {
         // Cache all DOM elements to reduce queries
         this.editor = document.getElementById('editor');
@@ -36,13 +64,16 @@ class MarkdownEditor {
         // Toolbar buttons
         this.modeToggle = document.getElementById('modeToggle');
         this.editorModeLabel = document.getElementById('editorModeLabel');
-        this.darkModeToggle = document.getElementById('darkModeToggle');
+        this.findReplaceBtn = document.getElementById('findReplaceBtn');
+        this.themePickerBtn = document.getElementById('themePickerBtn');
+        this.themePickerDropdown = document.getElementById('themePickerDropdown');
         this.clearBtn = document.getElementById('clearBtn');
         this.undoBtn = document.getElementById('undoBtn');
         this.redoBtn = document.getElementById('redoBtn');
         this.importMdBtn = document.getElementById('importMdBtn');
         this.downloadMdBtn = document.getElementById('downloadMdBtn');
         this.downloadHtmlBtn = document.getElementById('downloadHtmlBtn');
+        this.downloadPdfBtn = document.getElementById('downloadPdfBtn');
         this.copyMdBtn = document.getElementById('copyMdBtn');
         this.copyHtmlBtn = document.getElementById('copyHtmlBtn');
         this.editorFullscreenBtn = document.getElementById('editorFullscreenBtn');
@@ -72,6 +103,15 @@ class MarkdownEditor {
         // History tracking flag
         this.isApplyingHistoryState = false;
 
+        // Find & Replace instance
+        this.findReplace = null;
+
+        // PDF Export instance
+        this.pdfExport = null;
+
+        // Current theme
+        this.currentTheme = 'light';
+
         // Initialize
         this.init();
     }
@@ -82,13 +122,19 @@ class MarkdownEditor {
 
         this.setupEventListeners();
         this.loadContent();
-        this.loadDarkModePreference();
+        this.loadThemePreference();
 
         // Initialize rich text editor
         this.richTextEditor = new RichTextEditor(
             this.richTextEditorElement,
             this
         );
+
+        // Initialize Find & Replace
+        this.findReplace = new FindReplace(this);
+
+        // Initialize PDF Export
+        this.pdfExport = new PDFExport(this);
 
         this.updatePreview();
     }
@@ -125,10 +171,13 @@ class MarkdownEditor {
             }
         });
 
-        // Dark mode toggle
-        this.darkModeToggle.addEventListener('click', () => {
-            this.toggleDarkMode();
+        // Find & Replace button
+        this.findReplaceBtn.addEventListener('click', () => {
+            this.findReplace.open(false);
         });
+
+        // Theme picker
+        this.setupThemePicker();
 
         // Clear button
         this.clearBtn.addEventListener('click', () => {
@@ -159,6 +208,10 @@ class MarkdownEditor {
 
         this.downloadHtmlBtn.addEventListener('click', () => {
             this.downloadHtml();
+        });
+
+        this.downloadPdfBtn.addEventListener('click', () => {
+            this.pdfExport.openExportDialog();
         });
 
         // Copy buttons
@@ -268,26 +321,70 @@ class MarkdownEditor {
         await this.loadIndexedImages();
     }
 
+    /**
+     * Load images from IndexedDB with lazy loading support
+     * Uses Intersection Observer for performance optimization
+     * @returns {Promise<void>}
+     */
     async loadIndexedImages() {
         // Find all images with IndexedDB references
         const indexedImages = this.preview.querySelectorAll('img[data-image-id]');
 
-        for (const img of indexedImages) {
-            const imageId = img.getAttribute('data-image-id');
-            try {
-                const imageRecord = await imageStorage.getImage(imageId);
-                if (imageRecord && imageRecord.data) {
-                    img.src = imageRecord.data;
-                    img.style.maxWidth = '100%';
-                } else {
-                    // Image not found in IndexedDB
-                    img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><text x="10" y="50" font-size="12">Image not found</text></svg>';
-                    img.title = 'Image not found in storage';
-                }
-            } catch (error) {
-                console.error('Error loading image from IndexedDB:', error);
-                img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><text x="10" y="50" font-size="12">Error loading image</text></svg>';
+        // Use Intersection Observer for lazy loading
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(async (entry) => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        await this.loadSingleIndexedImage(img);
+                        observer.unobserve(img);
+                    }
+                });
+            }, {
+                rootMargin: '100px', // Start loading 100px before image enters viewport
+                threshold: 0.01
+            });
+
+            indexedImages.forEach(img => {
+                // Set placeholder while loading
+                img.style.minHeight = '100px';
+                img.style.backgroundColor = 'var(--bg-tertiary)';
+                imageObserver.observe(img);
+            });
+        } else {
+            // Fallback for browsers without Intersection Observer
+            for (const img of indexedImages) {
+                await this.loadSingleIndexedImage(img);
             }
+        }
+    }
+
+    /**
+     * Load a single image from IndexedDB
+     * @param {HTMLImageElement} img - The image element to load
+     * @returns {Promise<void>}
+     */
+    async loadSingleIndexedImage(img) {
+        const imageId = img.getAttribute('data-image-id');
+        try {
+            const imageRecord = await imageStorage.getImage(imageId);
+            if (imageRecord && imageRecord.data) {
+                img.src = imageRecord.data;
+                img.style.maxWidth = '100%';
+                img.style.minHeight = '';
+                img.style.backgroundColor = '';
+            } else {
+                // Image not found in IndexedDB
+                img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><text x="10" y="50" font-size="12">Image not found</text></svg>';
+                img.title = 'Image not found in storage';
+                img.style.minHeight = '';
+                img.style.backgroundColor = '';
+            }
+        } catch (error) {
+            console.error('Error loading image from IndexedDB:', error);
+            img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><text x="10" y="50" font-size="12">Error loading image</text></svg>';
+            img.style.minHeight = '';
+            img.style.backgroundColor = '';
         }
     }
 
@@ -531,31 +628,98 @@ console.log(greet('World'));
         this.saveStatus.textContent = message;
     }
 
-    toggleDarkMode() {
-        document.body.classList.toggle('dark-mode');
-        const isDark = document.body.classList.contains('dark-mode');
+    /**
+     * Set up the theme picker dropdown
+     */
+    setupThemePicker() {
+        // Toggle dropdown
+        this.themePickerBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = this.themePickerDropdown.classList.contains('visible');
+            this.themePickerDropdown.classList.toggle('visible');
+            this.themePickerBtn.setAttribute('aria-expanded', !isOpen);
+        });
 
-        // Update button emoji
-        this.darkModeToggle.textContent = isDark ? '☀️' : '🌙';
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!this.themePickerBtn.contains(e.target) && !this.themePickerDropdown.contains(e.target)) {
+                this.themePickerDropdown.classList.remove('visible');
+                this.themePickerBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
 
-        // Save preference
-        localStorage.setItem(CONSTANTS.DARK_MODE_KEY, isDark);
+        // Theme option clicks
+        const themeOptions = this.themePickerDropdown.querySelectorAll('.theme-option');
+        themeOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const theme = option.dataset.theme;
+                this.setTheme(theme);
+                this.themePickerDropdown.classList.remove('visible');
+                this.themePickerBtn.setAttribute('aria-expanded', 'false');
+            });
+
+            // Keyboard navigation
+            option.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    option.click();
+                }
+            });
+        });
+
+        // Keyboard navigation for dropdown
+        this.themePickerBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown' && this.themePickerDropdown.classList.contains('visible')) {
+                e.preventDefault();
+                const firstOption = this.themePickerDropdown.querySelector('.theme-option');
+                if (firstOption) firstOption.focus();
+            }
+        });
     }
 
-    loadDarkModePreference() {
-        const isDark = localStorage.getItem(CONSTANTS.DARK_MODE_KEY) === 'true';
+    /**
+     * Set the application theme
+     * @param {string} theme - Theme name (light, dark, ocean, forest, sunset, lavender, rose, mint)
+     */
+    setTheme(theme) {
+        // Remove all theme classes
+        document.body.classList.remove('dark-mode');
+        THEMES.forEach(t => {
+            if (t !== 'light' && t !== 'dark') {
+                document.body.classList.remove(`theme-${t}`);
+            }
+        });
+
+        // Apply new theme
+        if (theme === 'dark') {
+            document.body.classList.add('dark-mode');
+        } else if (theme !== 'light') {
+            document.body.classList.add(`theme-${theme}`);
+        }
+
+        this.currentTheme = theme;
+        localStorage.setItem(CONSTANTS.THEME_KEY, theme);
+
+        // Update active state in dropdown
+        const themeOptions = this.themePickerDropdown.querySelectorAll('.theme-option');
+        themeOptions.forEach(option => {
+            option.classList.toggle('active', option.dataset.theme === theme);
+        });
+    }
+
+    /**
+     * Load theme preference from localStorage or system preference
+     */
+    loadThemePreference() {
+        let theme = localStorage.getItem(CONSTANTS.THEME_KEY);
 
         // Check system preference if no saved preference
-        if (localStorage.getItem(CONSTANTS.DARK_MODE_KEY) === null) {
+        if (!theme) {
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (prefersDark) {
-                document.body.classList.add('dark-mode');
-                this.darkModeToggle.textContent = '☀️';
-            }
-        } else if (isDark) {
-            document.body.classList.add('dark-mode');
-            this.darkModeToggle.textContent = '☀️';
+            theme = prefersDark ? 'dark' : 'light';
         }
+
+        this.setTheme(theme);
     }
 
     clearEditor() {

@@ -1,16 +1,64 @@
-// History Manager
-// Handles undo/redo functionality for the editor
+/**
+ * History Manager Module
+ * Handles undo/redo functionality for the markdown editor
+ * @module HistoryManager
+ * @author Emrullah Celik
+ * @version 1.0.0
+ */
 
+/**
+ * Class representing the History Manager for undo/redo operations
+ * Maintains a stack of editor states and provides navigation through history
+ * @class
+ */
 class HistoryManager {
+    /**
+     * Create a HistoryManager instance
+     * Initializes empty history stack and configuration
+     */
     constructor() {
+        /**
+         * Array of saved editor states
+         * @type {string[]}
+         * @private
+         */
         this.history = [];
+
+        /**
+         * Current position in history stack (-1 means no history)
+         * @type {number}
+         * @private
+         */
         this.currentIndex = -1;
-        this.maxHistorySize = 100; // Maximum number of history states to keep
+
+        /**
+         * Maximum number of history states to keep
+         * @type {number}
+         * @default 100
+         */
+        this.maxHistorySize = 100;
+
+        /**
+         * Timer reference for debouncing history pushes
+         * @type {number|null}
+         * @private
+         */
         this.debounceTimer = null;
-        this.debounceDelay = 1000; // 1 second - don't save state more frequently than this
+
+        /**
+         * Delay in milliseconds before saving a state (debounce)
+         * @type {number}
+         * @default 1000
+         */
+        this.debounceDelay = 1000;
     }
 
-    // Push a new state to history (debounced to avoid too many states)
+    /**
+     * Push a new state to history with optional debouncing
+     * Debouncing prevents saving every keystroke, creating smoother UX
+     * @param {string} content - The editor content to save
+     * @param {boolean} [immediate=false] - If true, saves immediately without debouncing
+     */
     pushState(content, immediate = false) {
         // Clear any pending debounced push
         if (this.debounceTimer) {
@@ -29,7 +77,12 @@ class HistoryManager {
         }
     }
 
-    // Internal method to push state
+    /**
+     * Internal method to push state to history
+     * Handles deduplication and history size limiting
+     * @param {string} content - The editor content to save
+     * @private
+     */
     _pushStateInternal(content) {
         // Don't add if content is the same as current state
         if (this.currentIndex >= 0 && this.history[this.currentIndex] === content) {
@@ -37,6 +90,7 @@ class HistoryManager {
         }
 
         // If we're not at the end of history, remove everything after current position
+        // This creates a new branch in history when user makes changes after undoing
         if (this.currentIndex < this.history.length - 1) {
             this.history = this.history.slice(0, this.currentIndex + 1);
         }
@@ -45,14 +99,17 @@ class HistoryManager {
         this.history.push(content);
         this.currentIndex++;
 
-        // Limit history size
+        // Limit history size to prevent memory issues
         if (this.history.length > this.maxHistorySize) {
             this.history.shift();
             this.currentIndex--;
         }
     }
 
-    // Undo to previous state
+    /**
+     * Undo to previous state
+     * @returns {string|null} The previous state content, or null if at beginning
+     */
     undo() {
         // Flush any pending debounced state
         if (this.debounceTimer) {
@@ -67,7 +124,10 @@ class HistoryManager {
         return null;
     }
 
-    // Redo to next state
+    /**
+     * Redo to next state
+     * @returns {string|null} The next state content, or null if at end
+     */
     redo() {
         // Flush any pending debounced state
         if (this.debounceTimer) {
@@ -82,17 +142,26 @@ class HistoryManager {
         return null;
     }
 
-    // Check if undo is available
+    /**
+     * Check if undo operation is available
+     * @returns {boolean} True if undo is possible
+     */
     canUndo() {
         return this.currentIndex > 0;
     }
 
-    // Check if redo is available
+    /**
+     * Check if redo operation is available
+     * @returns {boolean} True if redo is possible
+     */
     canRedo() {
         return this.currentIndex < this.history.length - 1;
     }
 
-    // Get current state
+    /**
+     * Get the current state without modifying history
+     * @returns {string|null} Current state content, or null if no history
+     */
     getCurrentState() {
         if (this.currentIndex >= 0 && this.currentIndex < this.history.length) {
             return this.history[this.currentIndex];
@@ -100,7 +169,10 @@ class HistoryManager {
         return null;
     }
 
-    // Clear all history
+    /**
+     * Clear all history
+     * Useful when loading new content or resetting editor
+     */
     clear() {
         if (this.debounceTimer) {
             clearTimeout(this.debounceTimer);
@@ -110,7 +182,14 @@ class HistoryManager {
         this.currentIndex = -1;
     }
 
-    // Get history stats (for debugging)
+    /**
+     * Get history statistics for debugging
+     * @returns {Object} Statistics object
+     * @property {number} historySize - Number of states in history
+     * @property {number} currentIndex - Current position in history
+     * @property {boolean} canUndo - Whether undo is available
+     * @property {boolean} canRedo - Whether redo is available
+     */
     getStats() {
         return {
             historySize: this.history.length,
@@ -121,5 +200,8 @@ class HistoryManager {
     }
 }
 
-// Create global instance
+/**
+ * Global history manager instance
+ * @type {HistoryManager}
+ */
 const historyManager = new HistoryManager();

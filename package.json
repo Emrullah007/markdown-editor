@@ -1,22 +1,45 @@
 {
   "name": "markdown-editor",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A modern, interactive markdown editor with live preview, syntax highlighting, and export capabilities",
   "main": "index.html",
   "scripts": {
-    "start": "open index.html"
+    "start": "open index.html",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "keywords": [
     "markdown",
     "editor",
     "live-preview",
     "syntax-highlighting",
-    "web-app"
+    "web-app",
+    "wysiwyg",
+    "rich-text"
   ],
   "author": "Emrullah Celik <https://www.emrullahcelik.com/>",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Emrullah007/markdown-editor.git"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
+    "collectCoverageFrom": [
+      "*.js",
+      "!jest.config.js"
+    ],
+    "coverageDirectory": "coverage",
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setup.js"
+    ]
   }
 }

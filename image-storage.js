@@ -1,15 +1,57 @@
-// Image Storage Module
-// Handles image persistence using IndexedDB
+/**
+ * Image Storage Module
+ * Handles image persistence using IndexedDB for efficient storage
+ * @module ImageStorage
+ * @author Emrullah Celik
+ * @version 1.0.0
+ */
 
+/**
+ * Class representing the Image Storage manager
+ * Provides IndexedDB-based storage for images with cleanup and statistics
+ * @class
+ */
 class ImageStorage {
+    /**
+     * Create an ImageStorage instance
+     * Initializes database configuration
+     */
     constructor() {
+        /**
+         * IndexedDB database name
+         * @type {string}
+         * @private
+         */
         this.dbName = 'MarkdownEditorDB';
+
+        /**
+         * Object store name for images
+         * @type {string}
+         * @private
+         */
         this.storeName = 'images';
+
+        /**
+         * Database version for upgrades
+         * @type {number}
+         * @private
+         */
         this.dbVersion = 1;
+
+        /**
+         * Database connection reference
+         * @type {IDBDatabase|null}
+         * @private
+         */
         this.db = null;
     }
 
-    // Initialize IndexedDB
+    /**
+     * Initialize IndexedDB connection
+     * Creates the database and object store if they don't exist
+     * @returns {Promise<IDBDatabase>} Resolves with the database connection
+     * @throws {Error} If database initialization fails
+     */
     async init() {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open(this.dbName, this.dbVersion);
@@ -37,7 +79,17 @@ class ImageStorage {
         });
     }
 
-    // Store an image and return its ID
+    /**
+     * Store an image and return its unique ID
+     * @param {string} imageData - Base64 encoded image data URL
+     * @param {Object} [metadata={}] - Additional metadata to store
+     * @param {string} [metadata.alt] - Alt text for the image
+     * @param {string} [metadata.fileName] - Original filename
+     * @param {string} [metadata.fileType] - MIME type
+     * @param {number} [metadata.fileSize] - File size in bytes
+     * @returns {Promise<string>} Resolves with the generated image ID
+     * @throws {Error} If storage operation fails
+     */
     async storeImage(imageData, metadata = {}) {
         if (!this.db) await this.init();
 
@@ -68,7 +120,15 @@ class ImageStorage {
         });
     }
 
-    // Retrieve an image by ID
+    /**
+     * Retrieve an image by its ID
+     * @param {string} id - The image ID to retrieve
+     * @returns {Promise<Object|undefined>} Resolves with the image record or undefined if not found
+     * @property {string} id - Image ID
+     * @property {string} data - Base64 image data
+     * @property {number} timestamp - Storage timestamp
+     * @throws {Error} If retrieval operation fails
+     */
     async getImage(id) {
         if (!this.db) await this.init();
 
@@ -88,7 +148,11 @@ class ImageStorage {
         });
     }
 
-    // Get all images
+    /**
+     * Get all stored images
+     * @returns {Promise<Object[]>} Resolves with array of all image records
+     * @throws {Error} If retrieval operation fails
+     */
     async getAllImages() {
         if (!this.db) await this.init();
 
@@ -108,7 +172,12 @@ class ImageStorage {
         });
     }
 
-    // Delete an image by ID
+    /**
+     * Delete an image by its ID
+     * @param {string} id - The image ID to delete
+     * @returns {Promise<void>} Resolves when deletion is complete
+     * @throws {Error} If deletion operation fails
+     */
     async deleteImage(id) {
         if (!this.db) await this.init();
 
@@ -128,7 +197,12 @@ class ImageStorage {
         });
     }
 
-    // Clean up unused images (images not referenced in markdown)
+    /**
+     * Clean up images not referenced in the markdown content
+     * Helps prevent storage bloat from deleted images
+     * @param {string} markdown - The current markdown content
+     * @returns {Promise<void>} Resolves when cleanup is complete
+     */
     async cleanupUnusedImages(markdown) {
         try {
             const allImages = await this.getAllImages();
@@ -145,7 +219,13 @@ class ImageStorage {
         }
     }
 
-    // Extract image IDs from markdown content
+    /**
+     * Extract image IDs from markdown content
+     * Finds both image:// and indexed:// format references
+     * @param {string} markdown - Markdown content to search
+     * @returns {Set<string>} Set of image IDs found in the content
+     * @private
+     */
     extractImageIdsFromMarkdown(markdown) {
         const imageIds = new Set();
         // Match both formats: ![alt](image://id) and ![alt](indexed://id)
@@ -159,12 +239,22 @@ class ImageStorage {
         return imageIds;
     }
 
-    // Generate a unique image ID
+    /**
+     * Generate a unique image ID
+     * Combines timestamp with random string for uniqueness
+     * @returns {string} Unique image identifier
+     * @private
+     */
     generateImageId() {
         return `img-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     }
 
-    // Convert base64 images in markdown to IndexedDB references
+    /**
+     * Convert base64 images in markdown to IndexedDB references
+     * Useful for migrating inline images to storage
+     * @param {string} markdown - Markdown containing base64 images
+     * @returns {Promise<string>} Updated markdown with IndexedDB references
+     */
     async convertBase64ImagesToIndexedDB(markdown) {
         // Match base64 data URLs in markdown images
         const base64Regex = /!\[([^\]]*)\]\((data:image\/[^;]+;base64,[^)]+)\)/g;
@@ -194,7 +284,13 @@ class ImageStorage {
         return updatedMarkdown;
     }
 
-    // Get storage usage statistics
+    /**
+     * Get storage usage statistics
+     * @returns {Promise<Object>} Storage statistics
+     * @property {number} imageCount - Number of stored images
+     * @property {number} totalSize - Total size in bytes
+     * @property {string} totalSizeMB - Total size formatted as MB
+     */
     async getStorageStats() {
         try {
             const allImages = await this.getAllImages();
@@ -217,5 +313,8 @@ class ImageStorage {
     }
 }
 
-// Create global instance
+/**
+ * Global image storage instance
+ * @type {ImageStorage}
+ */
 const imageStorage = new ImageStorage();

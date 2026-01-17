@@ -1,12 +1,32 @@
-// Markdown Parser Module
-// Wrapper around Marked.js with custom configuration
+/**
+ * Markdown Parser Module
+ * Wrapper around Marked.js with custom configuration and syntax highlighting
+ * @module MarkdownParser
+ * @author Emrullah Celik
+ * @version 1.0.0
+ */
 
+/**
+ * Class representing the Markdown Parser
+ * Provides markdown to HTML conversion with GitHub Flavored Markdown support
+ * and syntax highlighting for code blocks
+ * @class
+ */
 class MarkdownParser {
+    /**
+     * Create a MarkdownParser instance
+     * Initializes Marked.js with custom configuration and renderer
+     */
     constructor() {
         this.initializeMarked();
     }
 
-    // HTML escape utility for security
+    /**
+     * HTML escape utility for security
+     * Prevents XSS attacks by escaping special HTML characters
+     * @param {string} text - Text to escape
+     * @returns {string} Escaped text safe for HTML insertion
+     */
     escapeHtml(text) {
         const map = {
             '&': '&amp;',
@@ -18,23 +38,34 @@ class MarkdownParser {
         return text.replace(/[&<>"']/g, m => map[m]);
     }
 
+    /**
+     * Initialize Marked.js with custom options and renderer
+     * Sets up GitHub Flavored Markdown support and syntax highlighting
+     * @private
+     */
     initializeMarked() {
-        // Configure marked options
+        // Configure marked options for GFM support
         marked.setOptions({
-            gfm: true, // GitHub Flavored Markdown
-            breaks: true, // Convert \n to <br>
-            headerIds: true,
-            mangle: false,
-            sanitize: false, // We trust the user input
-            smartLists: true,
-            smartypants: true, // Convert quotes to smart quotes
-            xhtml: false
+            gfm: true,          // GitHub Flavored Markdown
+            breaks: true,       // Convert \n to <br>
+            headerIds: true,    // Add IDs to headers
+            mangle: false,      // Don't escape autolinks
+            sanitize: false,    // Let DOMPurify handle sanitization
+            smartLists: true,   // Smart list behavior
+            smartypants: true,  // Convert quotes to smart quotes
+            xhtml: false        // Don't use XHTML self-closing tags
         });
 
-        // Custom renderer for code blocks with syntax highlighting
+        // Create custom renderer for enhanced output
         const renderer = new marked.Renderer();
 
-        // Override code block rendering
+        /**
+         * Custom code block rendering with syntax highlighting
+         * Uses Highlight.js for language-specific highlighting
+         * @param {string} code - The code content
+         * @param {string} language - The programming language
+         * @returns {string} HTML string with highlighted code
+         */
         renderer.code = function(code, language) {
             if (language && hljs.getLanguage(language)) {
                 try {
@@ -53,12 +84,23 @@ class MarkdownParser {
             }
         };
 
-        // Override inline code rendering with proper escaping
+        /**
+         * Custom inline code rendering with proper escaping
+         * @param {string} code - The inline code content
+         * @returns {string} HTML string with escaped code
+         */
         renderer.codespan = (code) => {
             return `<code>${this.escapeHtml(code)}</code>`;
         };
 
-        // Override image rendering to handle IndexedDB images
+        /**
+         * Custom image rendering to handle IndexedDB images
+         * Supports both regular URLs and IndexedDB image references
+         * @param {string} href - Image URL or IndexedDB reference
+         * @param {string} title - Image title attribute
+         * @param {string} text - Image alt text
+         * @returns {string} HTML img element
+         */
         renderer.image = (href, title, text) => {
             // Check if this is an IndexedDB image reference
             if (href.startsWith('indexed://')) {
@@ -66,20 +108,24 @@ class MarkdownParser {
                 const titleAttr = title ? ` title="${this.escapeHtml(title)}"` : '';
                 const altAttr = text ? this.escapeHtml(text) : '';
                 // Return a placeholder that will be replaced with actual image data
-                return `<img src="loading" alt="${altAttr}"${titleAttr} data-image-id="${imageId}" class="indexed-image">`;
+                return `<img src="loading" alt="${altAttr}"${titleAttr} data-image-id="${imageId}" class="indexed-image" loading="lazy">`;
             }
 
             // Standard image rendering with escaping
             const titleAttr = title ? ` title="${this.escapeHtml(title)}"` : '';
             const altAttr = text ? this.escapeHtml(text) : '';
-            return `<img src="${this.escapeHtml(href)}" alt="${altAttr}"${titleAttr} style="max-width: 100%;">`;
+            return `<img src="${this.escapeHtml(href)}" alt="${altAttr}"${titleAttr} style="max-width: 100%;" loading="lazy">`;
         };
 
         // Set the custom renderer
         marked.use({ renderer });
     }
 
-    // Parse markdown to HTML
+    /**
+     * Parse markdown string to HTML
+     * @param {string} markdown - Markdown content to parse
+     * @returns {string} HTML string
+     */
     parse(markdown) {
         if (!markdown || markdown.trim() === '') {
             return '<p class="placeholder">Start typing to see the preview...</p>';
@@ -93,7 +139,13 @@ class MarkdownParser {
         }
     }
 
-    // Get raw HTML (for export)
+    /**
+     * Generate a complete HTML document from markdown
+     * Includes styling for export purposes
+     * @param {string} markdown - Markdown content to convert
+     * @param {string} [title='Markdown Export'] - Document title
+     * @returns {string} Complete HTML document
+     */
     getHtmlDocument(markdown, title = 'Markdown Export') {
         const content = this.parse(markdown);
 
@@ -102,7 +154,7 @@ class MarkdownParser {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${title}</title>
+    <title>${this.escapeHtml(title)}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <style>
         body {
@@ -163,5 +215,8 @@ ${content}
     }
 }
 
-// Create global instance
+/**
+ * Global markdown parser instance
+ * @type {MarkdownParser}
+ */
 const markdownParser = new MarkdownParser();

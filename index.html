@@ -45,9 +45,48 @@
                     <p class="header-description">Write in Markdown or Rich Text • Live Preview • Export Anywhere</p>
                 </div>
                 <div class="header-actions">
-                    <button id="darkModeToggle" class="btn btn-icon" title="Toggle dark mode" aria-label="Toggle dark mode">
-                        🌙
+                    <button id="findReplaceBtn" class="btn btn-icon" title="Find & Replace (Ctrl+F)" aria-label="Open Find and Replace dialog">
+                        🔍
                     </button>
+                    <div class="theme-picker">
+                        <button id="themePickerBtn" class="theme-picker-btn" title="Change theme" aria-label="Open theme picker" aria-haspopup="true" aria-expanded="false">
+                            🎨 Theme
+                        </button>
+                        <div id="themePickerDropdown" class="theme-picker-dropdown" role="menu" aria-label="Theme options">
+                            <button class="theme-option" data-theme="light" role="menuitem">
+                                <span class="theme-swatch theme-swatch-light"></span>
+                                Light
+                            </button>
+                            <button class="theme-option" data-theme="dark" role="menuitem">
+                                <span class="theme-swatch theme-swatch-dark"></span>
+                                Dark
+                            </button>
+                            <button class="theme-option" data-theme="ocean" role="menuitem">
+                                <span class="theme-swatch theme-swatch-ocean"></span>
+                                Ocean
+                            </button>
+                            <button class="theme-option" data-theme="forest" role="menuitem">
+                                <span class="theme-swatch theme-swatch-forest"></span>
+                                Forest
+                            </button>
+                            <button class="theme-option" data-theme="sunset" role="menuitem">
+                                <span class="theme-swatch theme-swatch-sunset"></span>
+                                Sunset
+                            </button>
+                            <button class="theme-option" data-theme="lavender" role="menuitem">
+                                <span class="theme-swatch theme-swatch-lavender"></span>
+                                Lavender
+                            </button>
+                            <button class="theme-option" data-theme="rose" role="menuitem">
+                                <span class="theme-swatch theme-swatch-rose"></span>
+                                Rose
+                            </button>
+                            <button class="theme-option" data-theme="mint" role="menuitem">
+                                <span class="theme-swatch theme-swatch-mint"></span>
+                                Mint
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>
@@ -81,6 +120,9 @@
                 </button>
                 <button id="downloadHtmlBtn" class="btn" title="Download as HTML" aria-label="Download document as HTML file">
                     <span class="icon" aria-hidden="true">⬇️</span> Download HTML
+                </button>
+                <button id="downloadPdfBtn" class="btn" title="Download as PDF" aria-label="Download document as PDF file">
+                    <span class="icon" aria-hidden="true">📄</span> Download PDF
                 </button>
                 <button id="copyMdBtn" class="btn" title="Copy markdown to clipboard" aria-label="Copy markdown to clipboard">
                     <span class="icon" aria-hidden="true">📋</span> Copy MD
@@ -198,7 +240,8 @@
                     <span id="wordCount" class="stats-display" role="status" aria-live="polite">0 words • 0 characters • 0 min read</span>
                 </div>
                 <div class="footer-right">
-                    <span class="keyboard-hint">💾 <kbd>Ctrl</kbd>+<kbd>S</kbd> / <kbd>⌘</kbd>+<kbd>S</kbd> to save</span>
+                    <span class="keyboard-hint">🔍 <kbd>Ctrl</kbd>+<kbd>F</kbd> Find</span>
+                    <span class="keyboard-hint">💾 <kbd>Ctrl</kbd>+<kbd>S</kbd> Save</span>
                 </div>
             </div>
         </footer>
@@ -209,6 +252,8 @@
     <script src="history-manager.js"></script>
     <script src="markdown-parser.js"></script>
     <script src="rich-text-editor.js"></script>
+    <script src="find-replace.js"></script>
+    <script src="pdf-export.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

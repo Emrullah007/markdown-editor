@@ -5,6 +5,7 @@ A modern, feature-rich markdown and rich text editor with live preview, syntax h
 ![Markdown Editor](https://img.shields.io/badge/Editor-Markdown-blue)
 ![Rich Text](https://img.shields.io/badge/Editor-Rich%20Text-purple)
 ![License](https://img.shields.io/badge/license-MIT-green)
+![Version](https://img.shields.io/badge/version-1.1.0-brightgreen)
 
 ## Features
 
@@ -13,7 +14,8 @@ A modern, feature-rich markdown and rich text editor with live preview, syntax h
 - **Live Preview** - Real-time markdown rendering as you type
 - **Auto-save** - Automatic saving to browser's local storage every 2 seconds
 - **Undo/Redo** - Full history management with Ctrl+Z and Ctrl+Shift+Z shortcuts
-- **Dark Mode** - Eye-friendly dark theme with system preference detection
+- **Find & Replace** - Powerful search with regex support, case sensitivity, and whole word matching
+- **Custom Themes** - 8 beautiful themes including Light, Dark, Ocean, Forest, Sunset, Lavender, Rose, and Mint
 - **Responsive Design** - Optimized for desktop, tablet, and mobile devices
 - **Fullscreen Mode** - Expand editor or preview to fullscreen for focused work
 - **Word Count** - Live statistics showing word count, character count, and reading time
@@ -22,6 +24,7 @@ A modern, feature-rich markdown and rich text editor with live preview, syntax h
 - Import Markdown files (.md, .markdown, .txt) from disk
 - Download as Markdown (.md)
 - Download as HTML (.html)
+- **Download as PDF** - Export your document as a PDF file
 - Copy markdown to clipboard
 - Copy HTML to clipboard
 
@@ -31,11 +34,18 @@ A modern, feature-rich markdown and rich text editor with live preview, syntax h
 - **Syntax highlighting** for code blocks (powered by Highlight.js)
 - **Rich Text Toolbar** - Bold, italic, underline, headings, lists, and more
 - **Image Support** - Paste from clipboard, drag-and-drop, or upload files
+- **Lazy Loading Images** - Optimized image loading for better performance
 - **Table Insertion** - Create tables with custom rows and columns
 - **Code Blocks** - Insert formatted code with syntax highlighting
 - **Link & Image Insertion** - Easy insertion with prompts
-- **Keyboard shortcuts** - Ctrl/Cmd+S to download
+- **Keyboard shortcuts** - Comprehensive keyboard support
 - **Security** - XSS protection with DOMPurify sanitization
+
+### Accessibility
+- Full keyboard navigation support
+- ARIA labels and roles throughout
+- Screen reader friendly
+- Focus management
 
 ## Technology Stack
 
@@ -64,20 +74,49 @@ No build process or dependencies installation required! Just open and use.
 2. **Write Content** - Type your content in the editor pane (left side)
 3. **View Preview** - See the rendered HTML in the preview pane (right side)
 4. **Format Text** - Use the rich text toolbar for formatting (in Rich Text mode)
-5. **Toggle Dark Mode** - Click the moon/sun icon in the header
-6. **Export Your Work** - Use the toolbar buttons to download or copy
-7. **Fullscreen** - Click the fullscreen icon on editor or preview for focused work
+5. **Change Theme** - Click the Theme button to choose from 8 beautiful themes
+6. **Find & Replace** - Press Ctrl+F to search, Ctrl+H for find & replace
+7. **Export Your Work** - Use the toolbar buttons to download or copy
+8. **Fullscreen** - Click the fullscreen icon on editor or preview for focused work
 
 ### Keyboard Shortcuts
 
-- `Ctrl+S` (or `Cmd+S` on Mac) - Download markdown file
-- `Ctrl+Z` (or `Cmd+Z` on Mac) - Undo
-- `Ctrl+Shift+Z` or `Ctrl+Y` (or `Cmd+Shift+Z` / `Cmd+Y` on Mac) - Redo
-- `Ctrl+B` (or `Cmd+B` on Mac) - Bold (in Rich Text mode)
-- `Ctrl+I` (or `Cmd+I` on Mac) - Italic (in Rich Text mode)
-- `Ctrl+U` (or `Cmd+U` on Mac) - Underline (in Rich Text mode)
-- `Ctrl+K` (or `Cmd+K` on Mac) - Insert link (in Rich Text mode)
-- `Ctrl+Shift+X` (or `Cmd+Shift+X` on Mac) - Strikethrough (in Rich Text mode)
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+S` / `⌘+S` | Download markdown file |
+| `Ctrl+F` / `⌘+F` | Open Find dialog |
+| `Ctrl+H` / `⌘+H` | Open Find & Replace dialog |
+| `Ctrl+Z` / `⌘+Z` | Undo |
+| `Ctrl+Shift+Z` / `⌘+Shift+Z` | Redo |
+| `Ctrl+Y` / `⌘+Y` | Redo (alternative) |
+| `Ctrl+B` / `⌘+B` | Bold (Rich Text mode) |
+| `Ctrl+I` / `⌘+I` | Italic (Rich Text mode) |
+| `Ctrl+U` / `⌘+U` | Underline (Rich Text mode) |
+| `Ctrl+K` / `⌘+K` | Insert link (Rich Text mode) |
+| `Ctrl+Shift+X` / `⌘+Shift+X` | Strikethrough (Rich Text mode) |
+
+### Find & Replace Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Enter` | Find next |
+| `Shift+Enter` | Find previous |
+| `Escape` | Close dialog |
+
+## Themes
+
+The editor comes with 8 beautiful built-in themes:
+
+| Theme | Description |
+|-------|-------------|
+| **Light** | Clean, bright default theme |
+| **Dark** | Easy on the eyes for low-light environments |
+| **Ocean** | Deep blue tones inspired by the sea |
+| **Forest** | Natural green hues for a calm experience |
+| **Sunset** | Warm orange and red tones |
+| **Lavender** | Soft purple aesthetic |
+| **Rose** | Light pink theme with red accents |
+| **Mint** | Fresh green and teal combination |
 
 ## Supported Markdown Features
 
@@ -105,27 +144,44 @@ Works on all modern browsers:
 Requires JavaScript enabled and support for:
 - ES6+ features
 - LocalStorage API
+- IndexedDB API
 - Clipboard API (for copy functions)
+- Intersection Observer API (for lazy loading)
 
 ## Project Structure
 
 ```
 markdown-editor/
 ├── index.html              # Main HTML file
-├── styles.css              # CSS styling with dark mode
+├── styles.css              # CSS styling with themes
 ├── app.js                  # Core application logic
 ├── markdown-parser.js      # Markdown parsing wrapper
 ├── rich-text-editor.js     # Rich text editor functionality
 ├── image-storage.js        # IndexedDB image storage
 ├── history-manager.js      # Undo/redo history management
-├── package.json            # Project metadata
+├── find-replace.js         # Find & Replace functionality
+├── pdf-export.js           # PDF export functionality
+├── package.json            # Project metadata and test scripts
+├── tests/                  # Unit tests
+│   ├── setup.js           # Jest test setup
+│   ├── history-manager.test.js
+│   ├── find-replace.test.js
+│   └── image-storage.test.js
 ├── LICENSE                 # MIT License
 ├── CONTRIBUTING.md         # Contribution guidelines
-├── .gitignore              # Git ignore rules
 └── README.md               # This file
 ```
 
 ## Features in Detail
+
+### Find & Replace
+Powerful search functionality with:
+- Case-sensitive search option
+- Whole word matching
+- Regular expression support
+- Navigate between matches
+- Replace single or all occurrences
+- Works in both Markdown and Rich Text modes
 
 ### Auto-save
 Your content is automatically saved to the browser's localStorage every 2 seconds after you stop typing. When you return to the editor, your previous work is automatically restored.
@@ -133,8 +189,8 @@ Your content is automatically saved to the browser's localStorage every 2 second
 ### Undo/Redo
 Full history management with support for up to 100 states. Use Ctrl+Z to undo and Ctrl+Shift+Z or Ctrl+Y to redo. History is debounced to avoid saving every keystroke, creating a smooth editing experience.
 
-### Dark Mode
-Toggle between light and dark themes. Your preference is saved and will be remembered on your next visit. The editor also detects your system's color scheme preference on first load.
+### Custom Themes
+Toggle between 8 beautiful themes. Your preference is saved and will be remembered on your next visit. The editor also detects your system's color scheme preference on first load.
 
 ### Import
 Open markdown files directly from your disk. Supports .md, .markdown, and .txt files. The editor will prompt you before replacing existing content.
@@ -142,6 +198,7 @@ Open markdown files directly from your disk. Supports .md, .markdown, and .txt f
 ### Export
 - **Download .md** - Save your markdown as a file
 - **Download .html** - Export as a standalone HTML document with embedded styles
+- **Download .pdf** - Export as a PDF document (uses print dialog or html2pdf if available)
 - **Copy MD** - Copy raw markdown to clipboard
 - **Copy HTML** - Copy rendered HTML to clipboard
 
@@ -152,23 +209,42 @@ Live statistics display in the footer showing:
 - **Reading time** - Estimated reading time based on 200 words per minute
 
 ### Image Storage
-Images are stored efficiently in IndexedDB instead of localStorage, supporting files up to 10MB. Images are automatically loaded when you reopen your documents.
+Images are stored efficiently in IndexedDB instead of localStorage, supporting files up to 10MB. Images are:
+- Automatically loaded when you reopen your documents
+- Lazy-loaded for better performance
+- Cleaned up when no longer referenced
 
 ### Resizable Panes
 Drag the divider between the editor and preview panes to adjust their sizes according to your preference.
 
+## Development
+
+### Running Tests
+
+```bash
+# Install dev dependencies
+npm install
+
+# Run tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
+```
+
 ## Future Enhancements
 
 Potential features for future versions:
-- PDF export
 - Multiple file/tab support
-- Custom themes and theme builder
+- Custom theme builder
 - Vim/Emacs keybindings
 - Markdown templates library
 - Collaborative editing (requires backend)
 - Cloud sync (requires backend)
 - Spell checker
-- Find and replace functionality
 
 ## Contributing
 
