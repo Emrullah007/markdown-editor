@@ -1679,131 +1679,6 @@ body.theme-mint {
     color: var(--sh-hr);
 }
 
-/* ===== Focus Mode ===== */
-
-body.focus-mode .header,
-body.focus-mode .toolbar,
-body.focus-mode .rich-text-toolbar-wrapper,
-body.focus-mode .footer {
-    opacity: 0.4;
-    transition: opacity 0.3s ease;
-}
-
-body.focus-mode .header:hover,
-body.focus-mode .toolbar:hover,
-body.focus-mode .rich-text-toolbar-wrapper:hover,
-body.focus-mode .footer:hover {
-    opacity: 1;
-}
-
-body.focus-mode .preview-pane {
-    opacity: 0.5;
-    transition: opacity 0.3s ease;
-}
-
-body.focus-mode .preview-pane:hover {
-    opacity: 1;
-}
-
-/* Focus mode button active state */
-#focusModeBtn.active {
-    background: var(--accent-color);
-    color: white;
-    border-color: var(--accent-color);
-}
-
-/* Dimmed text in focus mode */
-.focus-dimmed {
-    opacity: 0.3;
-    transition: opacity 0.2s ease;
-}
-
-.focus-active {
-    opacity: 1;
-}
-
-/* Rich text focus mode */
-.focus-dimmed-rt {
-    opacity: 0.3 !important;
-    transition: opacity 0.2s ease;
-}
-
-.focus-paragraph {
-    opacity: 1 !important;
-    position: relative;
-}
-
-/* Optional: subtle highlight for focused paragraph */
-.focus-paragraph::before {
-    content: '';
-    position: absolute;
-    left: -1rem;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--accent-color);
-    border-radius: 2px;
-    opacity: 0.5;
-}
-
-/* Focus mode indicator */
-body.focus-mode::after {
-    content: 'Focus Mode';
-    position: fixed;
-    bottom: 1rem;
-    right: 1rem;
-    background: var(--accent-color);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    opacity: 0.7;
-    z-index: 1000;
-    pointer-events: none;
-    animation: fadeInOut 3s ease forwards;
-}
-
-@keyframes fadeInOut {
-    0% { opacity: 0; transform: translateY(10px); }
-    10% { opacity: 0.7; transform: translateY(0); }
-    80% { opacity: 0.7; }
-    100% { opacity: 0; }
-}
-
-/* ===== Typewriter Mode ===== */
-
-#typewriterModeBtn.active {
-    background: var(--accent-color);
-    color: white;
-    border-color: var(--accent-color);
-}
-
-/* Visual indicator for typewriter mode */
-body.typewriter-mode .editor-textarea,
-body.typewriter-mode .rich-text-editor {
-    /* Add extra padding to allow cursor centering at top of document */
-    padding-bottom: 50vh;
-}
-
-/* Typewriter mode indicator */
-body.typewriter-mode .editor-pane::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 40%;
-    height: 1px;
-    background: var(--accent-color);
-    opacity: 0.15;
-    pointer-events: none;
-    z-index: 10;
-}
-
-/* Subtle cursor line guide */
-body.typewriter-mode .editor-pane {
-    position: relative;
-}
 
 /* ===== Statistics Panel ===== */
 
@@ -2284,24 +2159,7 @@ body.typewriter-mode .editor-pane {
     }
 }
 
-/* ===== PWA Install & Update ===== */
-
-.install-btn {
-    background: linear-gradient(135deg, var(--accent-color), var(--accent-hover)) !important;
-    color: white !important;
-    border: none !important;
-    animation: pulse 2s infinite;
-}
-
-.install-btn:hover {
-    animation: none;
-    transform: scale(1.05);
-}
-
-@keyframes pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4); }
-    50% { box-shadow: 0 0 0 8px rgba(52, 152, 219, 0); }
-}
+/* ===== PWA Update ===== */
 
 .update-notification {
     position: fixed;
@@ -2368,10 +2226,3 @@ body.offline::before {
     z-index: 3000;
 }
 
-/* ===== Spell Checker ===== */
-
-#spellCheckBtn.active {
-    background: var(--success-color);
-    color: white;
-    border-color: var(--success-color);
-}
