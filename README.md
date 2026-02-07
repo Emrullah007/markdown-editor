@@ -34,7 +34,6 @@ A modern, feature-rich markdown and rich text editor with live preview, syntax h
 ### Import/Export Options
 - Import Markdown files (.md, .markdown, .txt) from disk
 - Download as Markdown (.md)
-- Download as HTML (.html)
 - **Download as PDF** - Export your document as a PDF file
 - Copy markdown to clipboard
 - Copy HTML to clipboard

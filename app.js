@@ -76,7 +76,6 @@ class MarkdownEditor {
         this.redoBtn = document.getElementById('redoBtn');
         this.importMdBtn = document.getElementById('importMdBtn');
         this.downloadMdBtn = document.getElementById('downloadMdBtn');
-        this.downloadHtmlBtn = document.getElementById('downloadHtmlBtn');
         this.downloadPdfBtn = document.getElementById('downloadPdfBtn');
         this.copyMdBtn = document.getElementById('copyMdBtn');
         this.copyHtmlBtn = document.getElementById('copyHtmlBtn');
@@ -139,7 +138,6 @@ class MarkdownEditor {
 
         // Table editor
         this.tableEditor = null;
-        this.markdownTableBtn = document.getElementById('markdownTableBtn');
 
         // Initialize
         this.init();
@@ -267,10 +265,6 @@ class MarkdownEditor {
             this.downloadMarkdown();
         });
 
-        this.downloadHtmlBtn.addEventListener('click', () => {
-            this.downloadHtml();
-        });
-
         this.downloadPdfBtn.addEventListener('click', () => {
             this.pdfExport.openExportDialog();
         });
@@ -363,26 +357,6 @@ class MarkdownEditor {
      * Set up table editor event listeners
      */
     setupTableEditorListeners() {
-        // Markdown mode table button
-        if (this.markdownTableBtn) {
-            this.markdownTableBtn.addEventListener('click', () => {
-                if (this.currentMode === 'markdown') {
-                    // Try to edit existing table at cursor first
-                    if (!this.tableEditor.editTableAtCursor()) {
-                        // No table at cursor, open grid picker to insert new one
-                        this.tableEditor.openGridPicker((rows, cols) => {
-                            this.tableEditor.insertNewTable(rows, cols);
-                        }, this.markdownTableBtn);
-                    }
-                } else {
-                    // In rich text mode, open grid picker
-                    this.tableEditor.openGridPicker((rows, cols) => {
-                        this.tableEditor.insertNewTable(rows, cols);
-                    }, this.markdownTableBtn);
-                }
-            });
-        }
-
         // Double-click on table in rich text editor opens table editor
         this.richTextEditorElement.addEventListener('dblclick', (e) => {
             if (this.currentMode !== 'richtext') return;
@@ -392,6 +366,17 @@ class MarkdownEditor {
                 this.tableEditor.editHTMLTable(tableEl);
             }
         });
+    }
+
+    openTableGrid(anchorButton) {
+        if (this.tableEditor && anchorButton) {
+            this.tableEditor.openGridPicker((rows, cols) => {
+                this.tableEditor.insertNewTable(rows, cols);
+            }, anchorButton);
+        } else if (this.richTextEditor) {
+            // Fallback to legacy prompt-based insertion if the table editor isn't ready yet
+            this.richTextEditor.insertTable();
+        }
     }
 
     schedulePreviewUpdate() {
@@ -598,7 +583,7 @@ class MarkdownEditor {
         this.imageBtn.addEventListener('click', () =>
             this.richTextEditor.insertImage());
         this.tableBtn.addEventListener('click', () =>
-            this.richTextEditor.insertTable());
+            this.openTableGrid(this.tableBtn));
         this.codeBlockBtn.addEventListener('click', () =>
             this.richTextEditor.insertCodeBlock());
     }
@@ -1053,18 +1038,6 @@ console.log(greet('World'));
         }
         const blob = new Blob([content], { type: 'text/markdown' });
         this.downloadFile(blob, 'document.md');
-    }
-
-    downloadHtml() {
-        let markdown;
-        if (this.currentMode === 'markdown') {
-            markdown = this.editor.value;
-        } else {
-            markdown = this.richTextEditor.getMarkdown();
-        }
-        const html = markdownParser.getHtmlDocument(markdown, 'Markdown Export');
-        const blob = new Blob([html], { type: 'text/html' });
-        this.downloadFile(blob, 'document.html');
     }
 
     downloadFile(blob, filename) {

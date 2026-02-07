@@ -22,20 +22,26 @@
     <link rel="stylesheet" href="styles.css">
 
     <!-- Highlight.js for syntax highlighting -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <link rel="stylesheet" href="node_modules/highlight.js/styles/github-dark.min.css">
 
     <!-- Marked.js for markdown parsing -->
-    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+    <script src="node_modules/marked/marked.min.js"></script>
 
-    <!-- Highlight.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>
+        // Lightweight fallback to avoid runtime errors if Highlight.js is unavailable
+        window.hljs = {
+            getLanguage: () => false,
+            highlight: (code) => ({ value: code }),
+            highlightAuto: (code) => ({ value: code })
+        };
+    </script>
 
     <!-- Turndown.js for HTML to Markdown conversion -->
-    <script src="https://cdn.jsdelivr.net/npm/turndown@7.1.2/dist/turndown.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/turndown-plugin-gfm@1.0.2/dist/turndown-plugin-gfm.js"></script>
+    <script src="node_modules/turndown/dist/turndown.js"></script>
+    <script src="node_modules/turndown-plugin-gfm/dist/turndown-plugin-gfm.js"></script>
 
     <!-- DOMPurify for XSS protection -->
-    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+    <script src="node_modules/dompurify/dist/purify.min.js"></script>
 
     <!-- Vercel Web Analytics -->
     <script>
@@ -125,9 +131,6 @@
                 </button>
                 <button id="downloadMdBtn" class="btn" title="Download as Markdown" aria-label="Download document as Markdown file">
                     <span class="icon" aria-hidden="true">⬇️</span> Download MD
-                </button>
-                <button id="downloadHtmlBtn" class="btn" title="Download as HTML" aria-label="Download document as HTML file">
-                    <span class="icon" aria-hidden="true">⬇️</span> Download HTML
                 </button>
                 <button id="downloadPdfBtn" class="btn" title="Download as PDF" aria-label="Download document as PDF file">
                     <span class="icon" aria-hidden="true">📄</span> Download PDF
@@ -263,6 +266,7 @@
     <script src="find-replace.js"></script>
     <script src="pdf-export.js"></script>
     <script src="syntax-highlighter.js"></script>
+    <script src="table-editor.js"></script>
     <script src="focus-mode.js"></script>
     <script src="auto-pair.js"></script>
     <script src="typewriter-mode.js"></script>
