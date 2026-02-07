@@ -24,10 +24,7 @@ A modern, feature-rich markdown and rich text editor with live preview, syntax h
 
 ### Writing Enhancements
 - **Markdown Syntax Highlighting** - Real-time syntax coloring in the editor
-- **Focus Mode** - Distraction-free writing with paragraph highlighting
-- **Typewriter Mode** - Keep cursor vertically centered while typing
 - **Auto-pair Characters** - Automatically close brackets, quotes, and markdown syntax
-- **Spell Checker** - Toggle browser spell checking on/off
 - **Statistics Panel** - Detailed document analytics with reading level
 - **Markdown Templates** - 10 built-in templates for common document types
 
@@ -99,8 +96,6 @@ No build process or dependencies installation required! Just open and use.
 | `Ctrl+Z` / `⌘+Z` | Undo |
 | `Ctrl+Shift+Z` / `⌘+Shift+Z` | Redo |
 | `Ctrl+Y` / `⌘+Y` | Redo (alternative) |
-| `Ctrl+Shift+F` / `⌘+Shift+F` | Toggle Focus Mode |
-| `Ctrl+Shift+T` / `⌘+Shift+T` | Toggle Typewriter Mode |
 | `Ctrl+B` / `⌘+B` | Bold (Rich Text mode) |
 | `Ctrl+I` / `⌘+I` | Italic (Rich Text mode) |
 | `Ctrl+U` / `⌘+U` | Underline (Rich Text mode) |
@@ -174,10 +169,7 @@ markdown-editor/
 ├── find-replace.js         # Find & Replace functionality
 ├── pdf-export.js           # PDF export functionality
 ├── syntax-highlighter.js   # Markdown syntax highlighting
-├── focus-mode.js           # Focus mode functionality
-├── typewriter-mode.js      # Typewriter mode functionality
 ├── auto-pair.js            # Auto-pair characters
-├── spell-checker.js        # Spell check toggle
 ├── statistics-panel.js     # Detailed statistics panel
 ├── templates.js            # Markdown templates library
 ├── sw.js                   # Service worker for PWA
@@ -265,10 +257,7 @@ npm run test:coverage
 
 ### ✅ Recently Added (v1.2.0)
 - Markdown Syntax Highlighting
-- Focus Mode
-- Typewriter Mode  
 - Auto-pair Characters
-- Spell Checker Toggle
 - Statistics Panel with Reading Level
 - Markdown Templates (10 templates)
 - PWA/Offline Support

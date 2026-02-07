@@ -230,10 +230,7 @@ Major feature update with writing enhancements and PWA support:
 
 **New Features:**
 - ✅ **Markdown Syntax Highlighting** - Real-time syntax coloring in editor textarea
-- ✅ **Focus Mode** - Distraction-free writing with paragraph highlighting (Ctrl+Shift+F)
-- ✅ **Typewriter Mode** - Keep cursor vertically centered while typing (Ctrl+Shift+T)
 - ✅ **Auto-pair Characters** - Automatically close brackets, quotes, and markdown syntax
-- ✅ **Spell Checker** - Toggle browser spell checking on/off
 - ✅ **Statistics Panel** - Detailed document analytics (words, sentences, reading level)
 - ✅ **Markdown Templates** - 10 built-in templates (Meeting Notes, Blog Post, README, etc.)
 - ✅ **PWA Support** - Install as app, offline support with service worker
@@ -243,10 +240,7 @@ Major feature update with writing enhancements and PWA support:
 
 **Files Added:**
 - `syntax-highlighter.js` - Markdown syntax highlighting
-- `focus-mode.js` - Focus mode functionality
-- `typewriter-mode.js` - Typewriter mode functionality
 - `auto-pair.js` - Auto-pair characters
-- `spell-checker.js` - Spell check toggle
 - `statistics-panel.js` - Detailed statistics
 - `templates.js` - Template library
 - `sw.js` - Service worker for PWA
@@ -297,10 +291,7 @@ Major feature update with extensive enhancements:
 | Feature | Description | Status |
 |---------|-------------|--------|
 | Markdown Syntax Highlighting | Highlight markdown syntax in editor textarea | ✅ Done |
-| Focus Mode | Dim everything except current paragraph | ✅ Done |
-| Spell Checker | Integrated spell checking toggle | ✅ Done |
 | Auto-pair Characters | Auto-close brackets, quotes, markdown syntax | ✅ Done |
-| Typewriter Mode | Keep cursor vertically centered while typing | ✅ Done |
 | Statistics Panel | Detailed stats (paragraphs, sentences, reading level) | ✅ Done |
 | PWA/Offline Support | Service worker for offline usage | ✅ Done |
 | Markdown Templates | Quick-insert templates (10 templates) | ✅ Done |

@@ -282,24 +282,6 @@ test.describe('Undo/Redo', () => {
     });
 });
 
-test.describe('Focus Mode', () => {
-    test.beforeEach(async ({ page }) => {
-        await gotoEditor(page);
-    });
-
-    test('should toggle focus mode', async ({ page }) => {
-        // Click focus mode button
-        await page.click('#focusModeBtn');
-        
-        // Body should have focus-mode class
-        await expect(page.locator('body')).toHaveClass(/focus-mode/);
-        
-        // Click again to disable
-        await page.click('#focusModeBtn');
-        await expect(page.locator('body')).not.toHaveClass(/focus-mode/);
-    });
-});
-
 test.describe('Statistics Panel', () => {
     test.beforeEach(async ({ page }) => {
         await gotoEditor(page);

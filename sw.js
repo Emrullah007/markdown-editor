@@ -21,9 +21,7 @@ const STATIC_ASSETS = [
     '/find-replace.js',
     '/pdf-export.js',
     '/syntax-highlighter.js',
-    '/focus-mode.js',
     '/auto-pair.js',
-    '/typewriter-mode.js',
     '/statistics-panel.js',
     '/templates.js',
     '/manifest.json'

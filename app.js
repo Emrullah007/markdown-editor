@@ -121,23 +121,14 @@ class MarkdownEditor {
         // Syntax highlighter
         this.syntaxHighlighter = null;
 
-        // Focus mode
-        this.focusMode = null;
-
         // Auto-pair
         this.autoPair = null;
-
-        // Typewriter mode
-        this.typewriterMode = null;
 
         // Statistics panel
         this.statisticsPanel = null;
 
         // Templates
         this.templates = null;
-
-        // Spell checker
-        this.spellChecker = null;
 
         // Table editor
         this.tableEditor = null;
@@ -169,25 +160,14 @@ class MarkdownEditor {
         // Initialize Syntax Highlighter for markdown editor
         this.syntaxHighlighter = new SyntaxHighlighter(this.editor);
 
-        // Initialize Focus Mode
-        this.focusMode = new FocusMode(this);
-        this.focusMode.loadPreference();
-
         // Initialize Auto-pair for markdown editor
         this.autoPair = new AutoPair(this.editor);
-
-        // Initialize Typewriter Mode
-        this.typewriterMode = new TypewriterMode(this);
-        this.typewriterMode.loadPreference();
 
         // Initialize Statistics Panel
         this.statisticsPanel = new StatisticsPanel(this);
 
         // Initialize Templates
         this.templates = new Templates(this);
-
-        // Initialize Spell Checker
-        this.spellChecker = new SpellChecker(this);
 
         // Initialize Table Editor
         this.tableEditor = new TableEditor(this);
@@ -1259,8 +1239,6 @@ console.log(greet('World'));
 }
 
 // Initialize the app when DOM is ready
-let deferredInstallPrompt = null;
-
 document.addEventListener('DOMContentLoaded', () => {
     new MarkdownEditor();
 
@@ -1285,13 +1263,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('Service Worker registration failed:', error);
             });
     }
-
-    // Handle PWA install prompt
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredInstallPrompt = e;
-        showInstallButton();
-    });
 });
 
 /**
@@ -1306,48 +1277,4 @@ function showUpdateNotification() {
         <button onclick="this.parentElement.remove()">×</button>
     `;
     document.body.appendChild(notification);
-}
-
-/**
- * Show install button when PWA can be installed
- * @param {Event} deferredPrompt - The beforeinstallprompt event
- */
-function showInstallButton() {
-    // Create install button in header
-    const headerActions = document.querySelector('.header-actions');
-    if (!headerActions) {
-        return;
-    }
-    const existingButtons = document.querySelectorAll('#installBtn');
-    if (existingButtons.length > 0) {
-        // Clean up any duplicates created by older versions.
-        for (let i = 1; i < existingButtons.length; i++) {
-            existingButtons[i].remove();
-        }
-        return;
-    }
-
-    const installBtn = document.createElement('button');
-    installBtn.id = 'installBtn';
-    installBtn.className = 'btn btn-icon install-btn';
-    installBtn.title = 'Install App';
-    installBtn.innerHTML = '📲 Install';
-
-    installBtn.addEventListener('click', async () => {
-        if (!deferredInstallPrompt) {
-            return;
-        }
-        deferredInstallPrompt.prompt();
-        const { outcome } = await deferredInstallPrompt.userChoice;
-
-        if (outcome === 'accepted') {
-            console.log('PWA installed');
-            installBtn.remove();
-        }
-
-        deferredInstallPrompt = null;
-    });
-
-    // Insert at the beginning
-    headerActions.insertBefore(installBtn, headerActions.firstChild);
 }
