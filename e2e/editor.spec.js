@@ -23,6 +23,29 @@ test.describe('Markdown Editor', () => {
         expect(content).toContain('Welcome to Markdown Editor');
     });
 
+    test('should start with cursor at the beginning of content', async ({ page }) => {
+        // Verify the editor starts with cursor at position 0 and scroll at top
+        const editorState = await page.evaluate(() => {
+            const editor = document.getElementById('editor');
+            return {
+                scrollTop: editor.scrollTop,
+                selectionStart: editor.selectionStart,
+                selectionEnd: editor.selectionEnd,
+                valueLength: editor.value.length
+            };
+        });
+        
+        // Cursor should be at the beginning
+        expect(editorState.selectionStart).toBe(0);
+        expect(editorState.selectionEnd).toBe(0);
+        
+        // Scroll should be at the top
+        expect(editorState.scrollTop).toBe(0);
+        
+        // Content should exist (not empty)
+        expect(editorState.valueLength).toBeGreaterThan(0);
+    });
+
     test('should update preview when typing', async ({ page }) => {
         const editor = page.locator('#editor');
         

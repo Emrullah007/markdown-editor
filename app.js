@@ -660,6 +660,9 @@ class MarkdownEditor {
                 this.editor.value = this.getDefaultContent();
             }
 
+            // Set cursor to the beginning of the textarea to prevent scrolling to the end
+            this.editor.setSelectionRange(0, 0);
+
             // Initialize history with the loaded content
             historyManager.pushState(this.editor.value, true);
             this.updateUndoRedoButtons();
@@ -675,6 +678,8 @@ class MarkdownEditor {
         } catch (error) {
             console.error('Error loading from localStorage:', error);
             this.editor.value = this.getDefaultContent();
+            // Set cursor to the beginning of the textarea to prevent scrolling to the end
+            this.editor.setSelectionRange(0, 0);
             historyManager.pushState(this.editor.value, true);
             this.updateUndoRedoButtons();
             this.updateWordCount();
