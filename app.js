@@ -16,6 +16,7 @@ const CONSTANTS = {
     PREVIEW_UPDATE_DELAY: 300, // 300ms
     STATUS_DISPLAY_DURATION: 2000, // 2 seconds
     STORAGE_KEY: 'markdown-editor-content',
+    BACKUP_KEY: 'markdown-editor-backup',
     THEME_KEY: 'markdown-editor-theme',
     RESIZER_MIN_PERCENT: 20,
     RESIZER_MAX_PERCENT: 80,
@@ -72,6 +73,8 @@ class MarkdownEditor {
         this.themePickerBtn = document.getElementById('themePickerBtn');
         this.themePickerDropdown = document.getElementById('themePickerDropdown');
         this.clearBtn = document.getElementById('clearBtn');
+        this.resetBtn = document.getElementById('resetBtn');
+        this.restoreBtn = document.getElementById('restoreBtn');
         this.undoBtn = document.getElementById('undoBtn');
         this.redoBtn = document.getElementById('redoBtn');
         this.importMdBtn = document.getElementById('importMdBtn');
@@ -193,6 +196,7 @@ class MarkdownEditor {
         this.setupTableEditorListeners();
 
         this.updatePreview();
+        this.resetScrollPosition();
 
         if (typeof window !== 'undefined') {
             window.__markdownEditorReady = true;
@@ -243,6 +247,16 @@ class MarkdownEditor {
         // Clear button
         this.clearBtn.addEventListener('click', () => {
             this.clearEditor();
+        });
+
+        // Reset to default (with draft backup)
+        this.resetBtn.addEventListener('click', () => {
+            this.resetToDefault();
+        });
+
+        // Restore cached draft
+        this.restoreBtn.addEventListener('click', () => {
+            this.restoreCachedDraft();
         });
 
         // Undo/Redo buttons
@@ -502,6 +516,13 @@ class MarkdownEditor {
             // Convert markdown to HTML and set in rich text editor
             const markdown = this.editor.value;
             await this.richTextEditor.setContent(markdown);
+            if (!this.richTextEditorElement.textContent.trim()) {
+                const fallbackHtml = DOMPurify.sanitize(
+                    this.preview.innerHTML || markdownParser.parse(markdown),
+                    DOMPURIFY_CONFIG
+                );
+                this.richTextEditorElement.innerHTML = fallbackHtml;
+            }
 
             // Disable syntax highlighting in rich text mode
             if (this.syntaxHighlighter) {
@@ -516,6 +537,8 @@ class MarkdownEditor {
             // Update UI
             this.modeToggle.innerHTML = '📝 Switch to Markdown';
             this.editorModeLabel.textContent = 'Rich Text Editor';
+            this.resetScrollPosition();
+            this.richTextEditorElement.focus();
 
         } else {
             // Switch to markdown mode
@@ -542,6 +565,7 @@ class MarkdownEditor {
 
             // Update preview
             await this.updatePreview();
+            this.resetScrollPosition();
         }
     }
 
@@ -749,6 +773,21 @@ console.log(greet('World'));
 `;
     }
 
+    resetScrollPosition() {
+        if (typeof window !== 'undefined') {
+            window.scrollTo(0, 0);
+        }
+        if (this.editor) {
+            this.editor.scrollTop = 0;
+        }
+        if (this.preview) {
+            this.preview.scrollTop = 0;
+        }
+        if (this.richTextEditorElement) {
+            this.richTextEditorElement.scrollTop = 0;
+        }
+    }
+
     updateSaveStatus(message) {
         this.saveStatus.textContent = message;
     }
@@ -866,6 +905,64 @@ console.log(greet('World'));
             historyManager.pushState('', true);
             this.updateUndoRedoButtons();
         }
+    }
+
+    async resetToDefault() {
+        const currentContent = this.currentMode === 'markdown'
+            ? this.editor.value
+            : this.richTextEditor.getMarkdown();
+
+        try {
+            localStorage.setItem(CONSTANTS.BACKUP_KEY, currentContent);
+        } catch (error) {
+            console.error('Error caching draft before reset:', error);
+        }
+
+        await this.applyContentToEditor(this.getDefaultContent(), true);
+        this.updateSaveStatus('Default content restored (draft saved)');
+        setTimeout(() => {
+            this.updateSaveStatus('Auto-save enabled');
+        }, CONSTANTS.STATUS_DISPLAY_DURATION);
+    }
+
+    async restoreCachedDraft() {
+        const cached = localStorage.getItem(CONSTANTS.BACKUP_KEY);
+        if (!cached) {
+            alert('No cached draft found to restore.');
+            return;
+        }
+
+        await this.applyContentToEditor(cached, true);
+        this.updateSaveStatus('Draft restored from cache');
+        setTimeout(() => {
+            this.updateSaveStatus('Auto-save enabled');
+        }, CONSTANTS.STATUS_DISPLAY_DURATION);
+    }
+
+    async applyContentToEditor(content, resetHistory = false) {
+        this.currentMode = 'markdown';
+        this.editor.parentNode.style.display = 'flex';
+        this.richTextEditorElement.style.display = 'none';
+        this.richTextToolbar.style.display = 'none';
+        this.modeToggle.innerHTML = '📝 Switch to Rich Text';
+        this.editorModeLabel.textContent = 'Markdown Editor';
+        this.editor.value = content;
+
+        if (this.syntaxHighlighter) {
+            this.syntaxHighlighter.enable();
+            this.syntaxHighlighter.update();
+        }
+
+        if (resetHistory) {
+            historyManager.clear();
+            historyManager.pushState(content, true);
+        }
+        this.updateUndoRedoButtons();
+
+        await this.updatePreview();
+        this.updateWordCount();
+        this.saveContent();
+        this.resetScrollPosition();
     }
 
     async undo() {
