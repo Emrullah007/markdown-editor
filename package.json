@@ -46,5 +46,12 @@
     "setupFilesAfterEnv": [
       "<rootDir>/tests/setup.js"
     ]
+  },
+  "dependencies": {
+    "@highlightjs/cdn-assets": "^11.9.0",
+    "dompurify": "^3.0.6",
+    "marked": "^11.1.1",
+    "turndown": "^7.1.2",
+    "turndown-plugin-gfm": "^1.0.2"
   }
 }
