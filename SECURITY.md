@@ -17,7 +17,7 @@ This project implements several security measures:
 - **No eval() or Function()**: Code doesn't use dangerous JavaScript functions
 - **Safe innerHTML usage**: All user-generated content is sanitized before rendering
 - **Input Validation**: URL and user input validation to block dangerous protocols and XSS patterns
-- **Sanitized execCommand**: All execCommand usage validated and sanitized
+- **execCommand usage**: The editor uses `document.execCommand`; commands and values should be carefully reviewed for safety
 
 ### Data Protection
 - **Client-side only**: All data is stored locally in browser's localStorage and IndexedDB
