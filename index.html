@@ -22,26 +22,6 @@
     <link rel="stylesheet" href="styles.css">
 
     <!-- Highlight.js for syntax highlighting -->
-    <link rel="stylesheet" href="node_modules/highlight.js/styles/github-dark.min.css">
-
-    <!-- Marked.js for markdown parsing -->
-    <script src="node_modules/marked/marked.min.js"></script>
-
-    <script>
-        // Lightweight fallback to avoid runtime errors if Highlight.js is unavailable
-        window.hljs = {
-            getLanguage: () => false,
-            highlight: (code) => ({ value: code }),
-            highlightAuto: (code) => ({ value: code })
-        };
-    </script>
-
-    <!-- Turndown.js for HTML to Markdown conversion -->
-    <script src="node_modules/turndown/dist/turndown.js"></script>
-    <script src="node_modules/turndown-plugin-gfm/dist/turndown-plugin-gfm.js"></script>
-
-    <!-- DOMPurify for XSS protection -->
-    <script src="node_modules/dompurify/dist/purify.min.js"></script>
 
     <!-- Vercel Web Analytics -->
     <script>
@@ -272,6 +252,7 @@
     <script src="typewriter-mode.js"></script>
     <script src="statistics-panel.js"></script>
     <script src="templates.js"></script>
+    <script src="table-editor.js"></script>
     <script src="spell-checker.js"></script>
     <script src="app.js"></script>
 </body>
