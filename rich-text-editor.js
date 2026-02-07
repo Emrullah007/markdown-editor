@@ -70,13 +70,27 @@ class RichTextEditor {
         url = url.trim();
 
         // Block dangerous protocols
-        const dangerousProtocols = ['javascript:', 'data:', 'vbscript:', 'file:', 'about:'];
+        const dangerousProtocols = [
+            'javascript:',
+            'data:',
+            'vbscript:',
+            'file:',
+            'about:',
+            'blob:',
+            'filesystem:'
+        ];
         const lowerUrl = url.toLowerCase();
 
         for (let protocol of dangerousProtocols) {
             if (lowerUrl.startsWith(protocol)) {
                 return false;
             }
+        }
+
+        // Block potential XSS patterns
+        if (lowerUrl.includes('<script') || lowerUrl.includes('onerror=') ||
+            lowerUrl.includes('onclick=') || lowerUrl.includes('onload=')) {
+            return false;
         }
 
         // Allow http, https, mailto, relative URLs
@@ -327,23 +341,42 @@ class RichTextEditor {
         const rows = prompt('Number of rows:', '3');
         const cols = prompt('Number of columns:', '3');
 
-        if (!rows || !cols || isNaN(rows) || isNaN(cols)) return;
+        if (!rows || !cols) return;
 
-        const rowCount = Math.min(parseInt(rows), 20); // Limit for safety
-        const colCount = Math.min(parseInt(cols), 10); // Limit for safety
+        // Validate and sanitize input
+        const rowCount = parseInt(rows, 10);
+        const colCount = parseInt(cols, 10);
+
+        if (isNaN(rowCount) || isNaN(colCount)) {
+            alert('Please enter valid numbers for rows and columns.');
+            return;
+        }
+
+        if (rowCount < 1 || colCount < 1) {
+            alert('Rows and columns must be at least 1.');
+            return;
+        }
+
+        // Limit for safety and performance
+        const safeRowCount = Math.min(rowCount, 20);
+        const safeColCount = Math.min(colCount, 10);
+
+        if (rowCount !== safeRowCount || colCount !== safeColCount) {
+            alert(`Table size limited to maximum 20 rows and 10 columns. Creating ${safeRowCount}x${safeColCount} table.`);
+        }
 
         let tableHTML = '<table role="grid"><thead><tr>';
 
         // Header row
-        for (let c = 0; c < colCount; c++) {
+        for (let c = 0; c < safeColCount; c++) {
             tableHTML += '<th scope="col">Header ' + (c + 1) + '</th>';
         }
         tableHTML += '</tr></thead><tbody>';
 
         // Body rows
-        for (let r = 0; r < rowCount - 1; r++) {
+        for (let r = 0; r < safeRowCount - 1; r++) {
             tableHTML += '<tr>';
-            for (let c = 0; c < colCount; c++) {
+            for (let c = 0; c < safeColCount; c++) {
                 tableHTML += '<td>Cell</td>';
             }
             tableHTML += '</tr>';
@@ -363,8 +396,12 @@ class RichTextEditor {
         const pre = document.createElement('pre');
         const code = document.createElement('code');
 
-        if (language) {
-            code.className = `language-${language}`;
+        if (language && language.trim()) {
+            // Sanitize language input - only allow alphanumeric, dash, and underscore
+            const safeLang = language.trim().replace(/[^a-zA-Z0-9\-_]/g, '');
+            if (safeLang) {
+                code.className = `language-${safeLang}`;
+            }
         }
 
         code.textContent = '// Enter your code here';

@@ -26,17 +26,15 @@ const STATIC_ASSETS = [
     '/typewriter-mode.js',
     '/statistics-panel.js',
     '/templates.js',
-    '/manifest.json'
-];
-
-// CDN resources to cache
-const CDN_ASSETS = [
-    'https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css',
-    'https://cdn.jsdelivr.net/npm/turndown@7.1.2/dist/turndown.js',
-    'https://cdn.jsdelivr.net/npm/turndown-plugin-gfm@1.0.2/dist/turndown-plugin-gfm.js',
-    'https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js'
+    '/table-editor.js',
+    '/spell-checker.js',
+    '/manifest.json',
+    '/libs/marked.min.js',
+    '/libs/highlight.min.js',
+    '/libs/github-dark.min.css',
+    '/libs/turndown.js',
+    '/libs/turndown-plugin-gfm.js',
+    '/libs/purify.min.js'
 ];
 
 /**
@@ -44,32 +42,12 @@ const CDN_ASSETS = [
  */
 self.addEventListener('install', (event) => {
     console.log('[SW] Installing service worker...');
-    
+
     event.waitUntil(
-        Promise.all([
-            // Cache static assets
-            caches.open(STATIC_CACHE).then((cache) => {
-                console.log('[SW] Caching static assets...');
-                return cache.addAll(STATIC_ASSETS);
-            }),
-            // Cache CDN assets
-            caches.open(DYNAMIC_CACHE).then((cache) => {
-                console.log('[SW] Caching CDN assets...');
-                return Promise.all(
-                    CDN_ASSETS.map((url) => {
-                        return fetch(url)
-                            .then((response) => {
-                                if (response.ok) {
-                                    return cache.put(url, response);
-                                }
-                            })
-                            .catch((err) => {
-                                console.warn(`[SW] Failed to cache CDN asset: ${url}`, err);
-                            });
-                    })
-                );
-            })
-        ]).then(() => {
+        caches.open(STATIC_CACHE).then((cache) => {
+            console.log('[SW] Caching static assets...');
+            return cache.addAll(STATIC_ASSETS);
+        }).then(() => {
             console.log('[SW] Installation complete');
             return self.skipWaiting();
         })
