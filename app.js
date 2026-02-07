@@ -33,7 +33,7 @@ const THEMES = ['light', 'dark', 'ocean', 'forest', 'sunset', 'lavender', 'rose'
  */
 const DOMPURIFY_CONFIG = {
     ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'strong', 'em', 'del', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'img', 'br', 'hr', 'span', 'div', 'input'],
-    ALLOWED_ATTR: ['href', 'src', 'alt', 'class', 'type', 'checked', 'disabled', 'title', 'id', 'target', 'rel', 'data-image-id', 'style'],
+    ALLOWED_ATTR: ['href', 'src', 'alt', 'class', 'type', 'checked', 'disabled', 'title', 'id', 'target', 'rel', 'data-image-id', 'style', 'scope'],
     ALLOW_DATA_ATTR: false
 };
 
@@ -137,6 +137,10 @@ class MarkdownEditor {
         // Spell checker
         this.spellChecker = null;
 
+        // Table editor
+        this.tableEditor = null;
+        this.markdownTableBtn = document.getElementById('markdownTableBtn');
+
         // Initialize
         this.init();
     }
@@ -183,6 +187,10 @@ class MarkdownEditor {
 
         // Initialize Spell Checker
         this.spellChecker = new SpellChecker(this);
+
+        // Initialize Table Editor
+        this.tableEditor = new TableEditor(this);
+        this.setupTableEditorListeners();
 
         this.updatePreview();
 
@@ -351,6 +359,41 @@ class MarkdownEditor {
         this.setupResizer();
     }
 
+    /**
+     * Set up table editor event listeners
+     */
+    setupTableEditorListeners() {
+        // Markdown mode table button
+        if (this.markdownTableBtn) {
+            this.markdownTableBtn.addEventListener('click', () => {
+                if (this.currentMode === 'markdown') {
+                    // Try to edit existing table at cursor first
+                    if (!this.tableEditor.editTableAtCursor()) {
+                        // No table at cursor, open grid picker to insert new one
+                        this.tableEditor.openGridPicker((rows, cols) => {
+                            this.tableEditor.insertNewTable(rows, cols);
+                        }, this.markdownTableBtn);
+                    }
+                } else {
+                    // In rich text mode, open grid picker
+                    this.tableEditor.openGridPicker((rows, cols) => {
+                        this.tableEditor.insertNewTable(rows, cols);
+                    }, this.markdownTableBtn);
+                }
+            });
+        }
+
+        // Double-click on table in rich text editor opens table editor
+        this.richTextEditorElement.addEventListener('dblclick', (e) => {
+            if (this.currentMode !== 'richtext') return;
+            const tableEl = e.target.closest('table');
+            if (tableEl) {
+                e.preventDefault();
+                this.tableEditor.editHTMLTable(tableEl);
+            }
+        });
+    }
+
     schedulePreviewUpdate() {
         // Clear existing timer
         if (this.previewUpdateTimer) {
@@ -385,7 +428,12 @@ class MarkdownEditor {
 
         // Use Intersection Observer for lazy loading
         if ('IntersectionObserver' in window) {
-            const imageObserver = new IntersectionObserver((entries, observer) => {
+            // Disconnect previous observer to prevent memory leak
+            if (this._imageObserver) {
+                this._imageObserver.disconnect();
+            }
+
+            this._imageObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(async (entry) => {
                     if (entry.isIntersecting) {
                         const img = entry.target;
@@ -402,7 +450,7 @@ class MarkdownEditor {
                 // Set placeholder while loading
                 img.style.minHeight = '100px';
                 img.style.backgroundColor = 'var(--bg-tertiary)';
-                imageObserver.observe(img);
+                this._imageObserver.observe(img);
             });
         } else {
             // Fallback for browsers without Intersection Observer
@@ -442,6 +490,11 @@ class MarkdownEditor {
     }
 
     async toggleMode() {
+        // Close table editor if open
+        if (this.tableEditor && this.tableEditor.isOpen) {
+            this.tableEditor.closeEditor(true);
+        }
+
         if (this.currentMode === 'markdown') {
             // Switch to rich text mode
             this.currentMode = 'richtext';
@@ -602,7 +655,7 @@ class MarkdownEditor {
             historyManager.pushState(this.editor.value, true);
             this.updateUndoRedoButtons();
             this.updateWordCount();
-            
+
             // Update syntax highlighting after content is loaded
             // (deferred to allow DOM to settle)
             setTimeout(() => {
@@ -815,21 +868,22 @@ console.log(greet('World'));
         }
     }
 
-    undo() {
+    async undo() {
         const previousState = historyManager.undo();
         if (previousState !== null) {
             this.isApplyingHistoryState = true;
 
             if (this.currentMode === 'markdown') {
                 this.editor.value = previousState;
-                this.updatePreview();
+                await this.updatePreview();
                 // Update syntax highlighting
                 if (this.syntaxHighlighter) {
                     this.syntaxHighlighter.update();
                 }
             } else {
                 // In rich text mode, we need to update the rich text editor
-                this.richTextEditorElement.innerHTML = markdownParser.parse(previousState);
+                const html = markdownParser.parse(previousState);
+                this.richTextEditorElement.innerHTML = DOMPurify.sanitize(html, DOMPURIFY_CONFIG);
             }
 
             this.updateUndoRedoButtons();
@@ -837,21 +891,22 @@ console.log(greet('World'));
         }
     }
 
-    redo() {
+    async redo() {
         const nextState = historyManager.redo();
         if (nextState !== null) {
             this.isApplyingHistoryState = true;
 
             if (this.currentMode === 'markdown') {
                 this.editor.value = nextState;
-                this.updatePreview();
+                await this.updatePreview();
                 // Update syntax highlighting
                 if (this.syntaxHighlighter) {
                     this.syntaxHighlighter.update();
                 }
             } else {
                 // In rich text mode, we need to update the rich text editor
-                this.richTextEditorElement.innerHTML = markdownParser.parse(nextState);
+                const html = markdownParser.parse(nextState);
+                this.richTextEditorElement.innerHTML = DOMPurify.sanitize(html, DOMPURIFY_CONFIG);
             }
 
             this.updateUndoRedoButtons();
@@ -968,7 +1023,7 @@ console.log(greet('World'));
                 // Add to history
                 historyManager.pushState(text, true);
                 this.updateUndoRedoButtons();
-                
+
                 // Update syntax highlighting
                 if (this.syntaxHighlighter) {
                     this.syntaxHighlighter.update();
@@ -1133,13 +1188,13 @@ let deferredInstallPrompt = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     new MarkdownEditor();
-    
+
     // Register service worker for PWA
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js')
             .then((registration) => {
                 console.log('Service Worker registered:', registration.scope);
-                
+
                 // Check for updates
                 registration.addEventListener('updatefound', () => {
                     const newWorker = registration.installing;
@@ -1155,7 +1210,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('Service Worker registration failed:', error);
             });
     }
-    
+
     // Handle PWA install prompt
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
@@ -1196,28 +1251,28 @@ function showInstallButton() {
         }
         return;
     }
-    
+
     const installBtn = document.createElement('button');
     installBtn.id = 'installBtn';
     installBtn.className = 'btn btn-icon install-btn';
     installBtn.title = 'Install App';
     installBtn.innerHTML = '📲 Install';
-    
+
     installBtn.addEventListener('click', async () => {
         if (!deferredInstallPrompt) {
             return;
         }
         deferredInstallPrompt.prompt();
         const { outcome } = await deferredInstallPrompt.userChoice;
-        
+
         if (outcome === 'accepted') {
             console.log('PWA installed');
             installBtn.remove();
         }
-        
+
         deferredInstallPrompt = null;
     });
-    
+
     // Insert at the beginning
     headerActions.insertBefore(installBtn, headerActions.firstChild);
 }

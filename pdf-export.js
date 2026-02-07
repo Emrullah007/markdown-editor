@@ -321,6 +321,7 @@ class PDFExport {
             return;
         }
 
+        printWindow.document.open();
         printWindow.document.write(htmlContent);
         printWindow.document.close();
 
