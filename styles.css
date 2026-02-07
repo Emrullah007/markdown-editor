@@ -119,9 +119,7 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: linear-gradient(135deg, var(--header-text) 0%, var(--header-text-accent, var(--header-text)) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
+    color: var(--header-text);
     transition: transform 0.2s ease;
 }
 
@@ -142,6 +140,18 @@ body {
     display: flex;
     gap: 0.75rem;
     animation: fadeInUp 0.6s ease-out 0.1s both;
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .header-title,
+    .header-actions {
+        animation: none;
+    }
+    
+    .logo:hover {
+        transform: none;
+    }
 }
 
 /* Toolbar */
@@ -717,12 +727,20 @@ body.dark-mode .keyboard-hint:hover {
         font-size: 0.8rem;
     }
 
+    .header {
+        padding: 1rem 1.5rem;
+    }
+
     .logo {
         font-size: 1.25rem;
     }
 
     .header-description {
         font-size: 0.75rem;
+    }
+
+    .header-actions {
+        gap: 0.5rem;
     }
 
     .footer-content {
