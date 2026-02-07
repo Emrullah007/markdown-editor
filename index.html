@@ -22,20 +22,6 @@
     <link rel="stylesheet" href="styles.css">
 
     <!-- Highlight.js for syntax highlighting -->
-    <link rel="stylesheet" href="libs/github-dark.min.css">
-
-    <!-- Marked.js for markdown parsing -->
-    <script src="libs/marked.min.js"></script>
-
-    <!-- Highlight.js -->
-    <script src="libs/highlight.min.js"></script>
-
-    <!-- Turndown.js for HTML to Markdown conversion -->
-    <script src="libs/turndown.js"></script>
-    <script src="libs/turndown-plugin-gfm.js"></script>
-
-    <!-- DOMPurify for XSS protection -->
-    <script src="libs/purify.min.js"></script>
 
     <!-- Vercel Web Analytics -->
     <script>
@@ -125,9 +111,6 @@
                 </button>
                 <button id="downloadMdBtn" class="btn" title="Download as Markdown" aria-label="Download document as Markdown file">
                     <span class="icon" aria-hidden="true">⬇️</span> Download MD
-                </button>
-                <button id="downloadHtmlBtn" class="btn" title="Download as HTML" aria-label="Download document as HTML file">
-                    <span class="icon" aria-hidden="true">⬇️</span> Download HTML
                 </button>
                 <button id="downloadPdfBtn" class="btn" title="Download as PDF" aria-label="Download document as PDF file">
                     <span class="icon" aria-hidden="true">📄</span> Download PDF
@@ -263,6 +246,7 @@
     <script src="find-replace.js"></script>
     <script src="pdf-export.js"></script>
     <script src="syntax-highlighter.js"></script>
+    <script src="table-editor.js"></script>
     <script src="focus-mode.js"></script>
     <script src="auto-pair.js"></script>
     <script src="typewriter-mode.js"></script>
