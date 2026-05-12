@@ -2,6 +2,7 @@
 
 A modern, feature-rich markdown and rich text editor with live preview, syntax highlighting, and export capabilities. Built with vanilla JavaScript, HTML, and CSS.
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit-brightgreen)](https://markdown-editor-hazel.vercel.app/)
 ![Markdown Editor](https://img.shields.io/badge/Editor-Markdown-blue)
 ![Rich Text](https://img.shields.io/badge/Editor-Rich%20Text-purple)
 ![License](https://img.shields.io/badge/license-MIT-green)
